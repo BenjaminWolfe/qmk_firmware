@@ -1,4 +1,4 @@
-/* Copyright 2019 Thomas Baart <thomas@splitkb.com>
+/* Copyright 2019 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,21 +33,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |        |   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  Bspc  |
+ * |    Tab |   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  Bspc  |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;  : |  ' "   |
+ * |   Caps |   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;  : |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |   Z  |   X  |   C  |   V  |   B  |      |      |  |      |      |   N  |   M  | ,  < | . >  | /  ? |  - _   |
+ * |        |   Z  |   X  |   C  |   V  |   B  | Paste|      |  |      | Lead |   N  |   M  | ,  < | . >  | /  ? |  - _   |
+ * |  Shift |      |      |      |      |      | Copy |      |  |      |      |      |      |      |      |      | Shift  |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      |      | Space|      |  |      | Space|      |      |      |
- *                        |      |      |      | Shift|      |  |      | Shift|      |      |      |
+ *                        |      |      | Space| Entr |      |  |      | Entr | Space|      |      |
+ *                        | Ctrl |  Opt |  Cmd | Nmbr | Nav  |  | Adjst| Nmbr |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      _______, KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                     KC_J,                 KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC, 
-      _______, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                     KC_H,                 KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT, 
-      _______, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                 _______, _______, _______, _______, KC_K,                 KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS, 
-                                 _______, _______, MT(MOD_LSFT, KC_SPC), _______, _______, _______, _______, MT(MOD_RSFT, KC_SPC), _______, _______
+      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                  KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_CAPS, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                  KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           KC_CCCV,             _______, _______,    KC_LEAD,     KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_MINS),
+                                 KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), LT(NUMBERS, KC_ENT), MO(NAV), MO(ADJUST), MO(NUMBERS), KC_SPC, _______, _______
     ),
 /*
  * Numbers and Symbols
@@ -95,19 +96,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------.                              ,-------------------------------------------.
  * |        |      |      |      |      |      |                              |      | F7   | F8   | F9   | F10  |        |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |      | SAI  | HUI  | VAI  |      |                              |      | F4   | F5   | F6   | F11  |        |
+ * |        |      | HUI  | SAI  | VAI  |      |                              |      | F4   | F5   | F6   | F11  |        |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |      | SAD  | HUD  | VAD  |      |      |      |  |      |      |      | F1   | F2   | F3   | F12  |        |
+ * |        |      | HUD  | SAD  | VAD  |      |      | VolUp|  |      |      |      | F1   | F2   | F3   | F12  |        |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
  *                        |      |      |      |      |      |  |      |      |      |      |      |
- *                        |      |      |      |      |      |  |      |      |      |      |      |
+ *                        | Prev | Play | Next | Mute | VolDn|  |      |      |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [ADJUST] = LAYOUT(
       _______, _______, _______, _______, _______, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
-      _______, _______, RGB_SAI, RGB_HUI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
-      _______, _______, RGB_SAD, RGB_HUD, RGB_VAD, _______, _______, _______, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
-                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+      _______, _______, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
+      _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
+                                 KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______
     ),
 // /*
 //  * Layer template
@@ -142,9 +143,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 copy_paste_timer = timer_read();
             } else {
                 if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, copy
-                    tap_code16(LCTL(KC_C));
+                    tap_code16(LCMD(KC_C));
                 } else { // Tap, paste
-                    tap_code16(LCTL(KC_V));
+                    tap_code16(LCMD(KC_V));
                 }
             }
             break;
@@ -179,26 +180,8 @@ void matrix_scan_user(void) {
         SEQ_ONE_KEY(KC_S) { // Windows screenshot
             SEND_STRING(SS_LGUI("\nS"));
         }
-        SEQ_TWO_KEYS(KC_F, KC_P) { // Fusion Projection prefix
-            SEND_STRING("[Projection] ");
-        }
-        SEQ_TWO_KEYS(KC_B, KC_B) { // Basecone invoice description
-            SEND_STRING("[Leveranciersnaam] [Factuurnummer]");
-        }
-        SEQ_TWO_KEYS(KC_E, KC_S) { // Support email splitkb
-            SEND_STRING("support@splitkb.com");
-        }
-        SEQ_TWO_KEYS(KC_E, KC_T) { // Email splitkb
-            SEND_STRING("thomas@splitkb.com");
-        }
         SEQ_TWO_KEYS(KC_E, KC_P) { // Email personal
-            SEND_STRING("mail@thomasbaart.nl");
-        }
-        SEQ_TWO_KEYS(KC_S, KC_D) { // Splitkb documentation
-            SEND_STRING("https://docs.splitkb.com/");
-        }
-        SEQ_TWO_KEYS(KC_S, KC_V) { // Splitkb VAT number
-            SEND_STRING("NL210593349B01");
+            SEND_STRING("benjamin.e.wolfe@gmail.com");
         }
         SEQ_TWO_KEYS(KC_B, KC_C) { // Discord bongocat
             SEND_STRING(":bongocat:\n");
@@ -207,10 +190,7 @@ void matrix_scan_user(void) {
             SEND_STRING("```c" SS_LSFT("\n\n") "``` " SS_TAP(X_UP));
         }
         SEQ_TWO_KEYS(KC_Y, KC_S) { // Greeting
-            SEND_STRING("Yours sincerely,\n\nThomas Baart");
-        }
-        SEQ_THREE_KEYS(KC_M, KC_V, KC_G) { // Greeting
-            SEND_STRING("Met vriendelijke groet,\n\nThomas Baart");
+            SEND_STRING("Best,\n\nBenjamin");
         }
     }
 }
