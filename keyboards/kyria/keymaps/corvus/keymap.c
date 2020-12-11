@@ -33,22 +33,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |    Tab |   Q  |   W  |   F  |   P  |   G  |                              |   J  |   L  |   U  |   Y  | ;  : |  Bspc  |
+ * |    Tab |   Q  |   W  |   F  |   P  |   G  |                              |   J  |   L  |   U  |   Y  | ;  : |   `    |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
  * |   Caps |   A  |   R  |   S  |   T  |   D  |                              |   H  |   N  |   E  |   I  |   O  |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |        |   Z  |   X  |   C  |   V  |   B  | Paste|      |  |      | Lead |   K  |   M  | ,  < | . >  | /  ? |  - _   |
  * |  Shift |      |      |      |      |      | Copy |      |  |      |      |      |      |      |      |      | Shift  |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      | Space| Entr |      |  |      |      | Space|      |      |
+ *                        |      |      | Space|      |      |  |      | Entr | Space| Bspc |      |
  *                        | Ctrl |  Opt |  Cmd | Nmbr | Nav  |  | Adjst| Nmbr |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                  KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                  KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_GRV,
       KC_CAPS, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                  KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           KC_CCCV,             _______, _______,    KC_LEAD,     KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_MINS),
-                                 KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), LT(NUMBERS, KC_ENT), MO(NAV), MO(ADJUST), MO(NUMBERS), KC_SPC, _______, _______
+      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           KC_CCCV,     _______, _______,    KC_LEAD,             KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_MINS),
+                                 KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NUMBERS), MO(NAV), MO(ADJUST), LT(NUMBERS, KC_ENT), KC_SPC, KC_BSPC, _______
     ),
 /*
  * Numbers and Symbols
@@ -132,10 +132,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //     ),
 };
 
-layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, NUMBERS, NAV, ADJUST);
-}
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_CCCV:  // One key copy/paste
@@ -194,6 +190,16 @@ void matrix_scan_user(void) {
         }
     }
 }
+
+#define HSV_BLUE 144, 255, 255 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
+
+#ifdef RGBLIGHT_ENABLE
+void keyboard_post_init_user(void) {
+  rgblight_enable_noeeprom(); // Enables RGB, without saving settings
+  rgblight_sethsv_noeeprom(HSV_BLUE);
+  rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
+}
+#endif
 
 #ifdef OLED_DRIVER_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
