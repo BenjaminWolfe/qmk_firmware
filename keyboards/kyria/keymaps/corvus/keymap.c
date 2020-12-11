@@ -191,12 +191,12 @@ void matrix_scan_user(void) {
     }
 }
 
-#define HSV_BLUE 144, 255, 255 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
+#define HSV_BLUISH 152, 255, 255 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
 
 #ifdef RGBLIGHT_ENABLE
 void keyboard_post_init_user(void) {
   rgblight_enable_noeeprom(); // Enables RGB, without saving settings
-  rgblight_sethsv_noeeprom(HSV_BLUE);
+  rgblight_sethsv_noeeprom(HSV_BLUISH);
   rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
 }
 #endif
