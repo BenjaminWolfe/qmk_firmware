@@ -33,22 +33,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |    Tab |   Q  |   W  |   F  |   P  |   G  |                              |   J  |   L  |   U  |   Y  | ;  : |   `    |
+ * |    Esc |   Q  |   W  |   F  |   P  |   G  |                              |   J  |   L  |   U  |   Y  | ;  : | Bspc   |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |   Caps |   A  |   R  |   S  |   T  |   D  |                              |   H  |   N  |   E  |   I  |   O  |  ' "   |
+ * |    Tab |   A  |   R  |   S  |   T  |   D  |                              |   H  |   N  |   E  |   I  |   O  |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |   Z  |   X  |   C  |   V  |   B  | Paste|      |  |      | Lead |   K  |   M  | ,  < | . >  | /  ? |  - _   |
+ * |   Caps |   Z  |   X  |   C  |   V  |   B  | Paste|      |  |      | Lead |   K  |   M  | ,  < | . >  | /  ? | Enter  |
  * |  Shift |      |      |      |      |      | Copy |      |  |      |      |      |      |      |      |      | Shift  |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      | Space|      |      |  |      | Entr | Space| Bspc |      |
+ *                        |      |      | Space|      |      |  |   `  |  - _ | Space| =  + |      |
  *                        | Ctrl |  Opt |  Cmd | Nmbr | Nav  |  | Adjst| Nmbr |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                  KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_GRV,
-      KC_CAPS, KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                  KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           KC_CCCV,     _______, _______,    KC_LEAD,             KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_MINS),
-                                 KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NUMBERS), MO(NAV), MO(ADJUST), LT(NUMBERS, KC_ENT), KC_SPC, KC_BSPC, _______
+      KC_ESC,          KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                           KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                           KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      LSFT_T(KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           KC_CCCV,     _______, _______,            KC_LEAD,              KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_ENT),
+                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NUMBERS), MO(NAV), LT(ADJUST, KC_GRV), LT(NUMBERS, KC_MINS), KC_SPC, KC_EQL,  _______
     ),
 /*
  * Numbers and Symbols
@@ -56,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------.                              ,-------------------------------------------.
  * |        |  !   |  @   |  {   |  }   |  |   |                              |      | 7 &  | 8 *  | 9 (  |      |        |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |  #   |  $   |  (   |  )   |  `   |                              |      | 4 $  | 5 %  | 6 ^  |      |        |
+ * |        |  #   |  $   |  (   |  )   |  `   |                              |      | 4 $  | 5 %  | 6 ^  |      |  Del   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |        |  %   |  ^   |  [   |  ]   |  ~   |      |      |  |      |      |      | 1 !  | 2 @  | 3 #  |      |        |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
@@ -66,7 +66,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NUMBERS] = LAYOUT(
       _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                     _______, KC_7,    KC_8,   KC_9, _______, _______,
-      _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                      _______, KC_4,    KC_5,   KC_6, _______, _______,
+      _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                      _______, KC_4,    KC_5,   KC_6, _______, KC_DEL,
       _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, _______, _______, _______, _______, _______, KC_1,    KC_2,   KC_3, _______, _______,
                                  _______, _______, _______, _______, _______, _______, _______, KC_0,    _______, _______
     ),
