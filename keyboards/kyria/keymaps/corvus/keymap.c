@@ -61,6 +61,15 @@ void enter_rshift_num_reset(qk_tap_dance_state_t *state, void *user_data);
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data);
 void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
 
+void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
+void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
+
+void undo_redo_finished(qk_tap_dance_state_t *state, void *user_data);
+void undo_redo_reset(qk_tap_dance_state_t *state, void *user_data);
+
+void find_replace_finished(qk_tap_dance_state_t *state, void *user_data);
+void find_replace_reset(qk_tap_dance_state_t *state, void *user_data);
+
 uint16_t copy_paste_timer;
 
 // TODO: Make the layers match the enum.
