@@ -46,7 +46,8 @@ enum {
     NUMPAD_UNICODE,
     COPY_CUT_PASTE,
     UNDO_REDO,
-    FIND_REPLACE
+    FIND_REPLACE,
+    NAV_TAB
 };
 
 uint8_t cur_dance(qk_tap_dance_state_t *state);
@@ -63,6 +64,9 @@ void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
 
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
+
+void nav_tab_finished(qk_tap_dance_state_t *state, void *user_data);
+void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data);
 
 uint16_t copy_paste_timer;
 
@@ -88,12 +92,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* 
  * Base Layer: COLEMAK
  * Resting middle position of each thumb is spacebar; on left, hold for command key
+ * NAV_TAB: hold for NAV layer; tap and hold for NAV layer, with command depressed, starting with Tab press + release (for window switching)
  * NUMPAD_UNICODE:
  *     hold for numpad; tap to cycle input modes (on Mac) to get to Unicode;
  *     tap and hold for UNICODE layer (modded with option key); double-tap to toggle input mode back (on Mac)
  * KC_BKTK_ESCAPE: tap for backtick, hold for escape
  * CAPS_LS_NUM: tap for caps lock, hold for shift, tap and hold for SYMBOLS layer
  * ENTER_RS_NUM: tap for enter, hold for shift, tap and hold for SYMBOLS layer
+ * Caps Lock is duplicated because it does not appear to be working yet in CAPS_LS_NUM
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |Backspace|
@@ -102,18 +108,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |Caps Lock|       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Enter  |
- * |  Shift  |   Z   |   X   |   C   |   V   |   B   |       |       |  |       | Leadr |   K   |   M   |  , <  |  . >  |  / ?  |  Shift  |
+ * |  Shift  |   Z   |   X   |   C   |   V   |   B   |       |CapsLck|  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Shift  |
  * | SYMBOLS |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       | SYMBOLS |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |       |NUMBERS|  |       |  - _  | Space |  Del  |       |
- *                           |Control|  Opt  |Command|  NAV  |UNICODE|  | ADJST |       |       |       |       |
+ *                           |       |       | Space |  NAV  |NUMBERS|  |       |  - _  | Space |  Del  |       |
+ *                           |Control|  Opt  |Command|NAV/Tab|UNICODE|  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                             KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
-      KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                             KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      TD(CAPS_LS_NUM), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,            _______,    KC_LEAD, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD(ENTER_RS_NUM),
-                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NAV), TD(NUMPAD_UNICODE), MO(ADJUST), KC_MINS, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                 KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      TD(CAPS_LS_NUM), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______,     KC_CAPS,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD(ENTER_RS_NUM),
+                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_MINS, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
@@ -320,7 +326,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * How to figure out tap dance state: interrupted and pressed.
  *
  * Interrupted: If the state of a dance dance is "interrupted", that means that another key has been hit
- *  under the tapping term. This is typically indicitive that you are trying to "tap" the key.
+ *  under the tapping term. This is typically indicative that you are trying to "tap" the key.
  *
  * Pressed: Whether or not the key is still being pressed. If this value is true, that means the tapping term
  *  has ended, but the key is still being pressed down. This generally means the key is being "held".
@@ -411,6 +417,11 @@ static tap numpad_unicode_tap_state = {
 };
 
 static tap copy_cut_paste_tap_state = {
+    .is_press_action = true,
+    .state = 0
+};
+
+static tap nav_tab_tap_state = {
     .is_press_action = true,
     .state = 0
 };
@@ -525,11 +536,40 @@ void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data) {
     copy_cut_paste_tap_state.state = 0;
 }
 
+void nav_tab_finished(qk_tap_dance_state_t *state, void *user_data) {
+    // favors hold, with hold_cur_dance
+    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
+    nav_tab_tap_state.state = hold_cur_dance(state);
+    switch (nav_tab_tap_state.state) {
+        case SINGLE_TAP: break;
+        case SINGLE_HOLD: layer_on(NAV); break;
+        case DOUBLE_TAP: break;
+        case DOUBLE_HOLD: layer_on(NAV); register_code(KC_LCMD); tap_code(KC_TAB); break;
+        // Last case is for fast typing. Assuming your key is `f`:
+        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+        case DOUBLE_SINGLE_TAP: break;
+    }
+}
+
+void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data) {
+    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
+    switch (nav_tab_tap_state.state) {
+        case SINGLE_TAP: break;
+        case SINGLE_HOLD: layer_off(NAV); break;
+        case DOUBLE_TAP: break;
+        case DOUBLE_HOLD: unregister_code(KC_LCMD); layer_off(NAV); break;
+        case DOUBLE_SINGLE_TAP: break;
+    }
+    nav_tab_tap_state.state = 0;
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
     [CAPS_LS_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, caps_lshift_num_finished, caps_lshift_num_reset),
     [ENTER_RS_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, enter_rshift_num_finished, enter_rshift_num_reset),
     [NUMPAD_UNICODE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_unicode_finished, numpad_unicode_reset),
     [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
+    [NAV_TAB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, nav_tab_finished, nav_tab_reset),
     [UNDO_REDO] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_Z), SCMD(KC_Z)),
     [FIND_REPLACE] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_F), LOPT(LCMD(KC_F))),
 };
@@ -551,6 +591,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+#ifdef LEADER_ENABLE
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
 
@@ -591,6 +632,7 @@ void matrix_scan_user(void) {
         }
     }
 }
+#endif
 
 #define HSV_BLUISH 152, 255, 255 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
 
