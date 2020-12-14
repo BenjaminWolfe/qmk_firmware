@@ -51,7 +51,7 @@ enum {
 
 uint8_t cur_dance(qk_tap_dance_state_t *state);
 
-// For the x tap dance. Put it here so it can be used in any keymap
+// For each advanced tap dance. Put these here so they can be used in any keymap
 void caps_lshift_num_finished(qk_tap_dance_state_t *state, void *user_data);
 void caps_lshift_num_reset(qk_tap_dance_state_t *state, void *user_data);
 
@@ -63,12 +63,6 @@ void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
 
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
-
-void undo_redo_finished(qk_tap_dance_state_t *state, void *user_data);
-void undo_redo_reset(qk_tap_dance_state_t *state, void *user_data);
-
-void find_replace_finished(qk_tap_dance_state_t *state, void *user_data);
-void find_replace_reset(qk_tap_dance_state_t *state, void *user_data);
 
 uint16_t copy_paste_timer;
 
@@ -116,10 +110,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                         KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
-      KC_TAB,         KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                         KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      CAPS_LS_NUM,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,        _______,    KC_LEAD, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, ENTER_RS_NUM,
-                                        KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NAV), NUMPAD_UNICODE, MO(ADJUST), KC_MINS, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                             KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                             KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      TD(CAPS_LS_NUM), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,            _______,    KC_LEAD, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD(ENTER_RS_NUM),
+                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), MO(NAV), TD(NUMPAD_UNICODE), MO(ADJUST), KC_MINS, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
@@ -180,9 +174,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [CODING] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                     KC_LPRN, KC_RPRN, KC_PSLS, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______,                                     KC_LBRC, KC_RBRC, KC_PIPE, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, KC_BSLS, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______,                                     _______, KC_LPRN, KC_RPRN, KC_PSLS, _______, _______,
+      _______, _______, _______, _______, _______, _______,                                     _______, KC_LBRC, KC_RBRC, KC_PIPE, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, KC_BSLS, _______, _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
@@ -230,10 +224,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      _______, _______, _______, _______,    _______,    _______,                                     _______, _______,         _______,   _______,      _______, _______,
-      _______, _______, _______, MO(VSCODE), MO(CHROME), _______,                                     _______, COPY_CUT_PASTE,  UNDO_REDO, FIND_REPLACE, _______, _______,
-      _______, _______, _______, _______,    _______,    _______, _______, _______, _______, _______, _______, _______,         _______,   _______,      _______, _______,
-                                 _______,    _______,    _______, _______, _______, KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,         _______
+      _______, _______, _______, _______,    _______,    _______,                                     _______, _______,            _______,       _______,          _______, _______,
+      _______, _______, _______, MO(VSCODE), MO(CHROME), _______,                                     _______, TD(COPY_CUT_PASTE), TD(UNDO_REDO), TD(FIND_REPLACE), _______, _______,
+      _______, _______, _______, _______,    _______,    _______, _______, _______, _______, _______, _______, _______,            _______,       _______,          _______, _______,
+                                 _______,    _______,    _______, _______, _______, KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,            _______
     ),
  /*
   * Chrome
@@ -331,7 +325,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Pressed: Whether or not the key is still being pressed. If this value is true, that means the tapping term
  *  has ended, but the key is still being pressed down. This generally means the key is being "held".
  *
- * One thing that is currenlty not possible with qmk software in regards to tap dance is to mimic the "permissive hold"
+ * One thing that is currently not possible with qmk software in regards to tap dance is to mimic the "permissive hold"
  *  feature. In general, advanced tap dances do not work well if they are used with commonly typed letters.
  *  For example "A". Tap dances are best used on non-letter keys that are not hit while typing letters.
  *
@@ -348,6 +342,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * For the third point, there does exist the 'DOUBLE_SINGLE_TAP', however this is not fully tested
  *
  */
+// To activate SINGLE_HOLD, you will need to hold for 200ms first.
+// This tap dance favors keys that are used frequently in typing like 'f'
 uint8_t cur_dance(qk_tap_dance_state_t *state) {
     if (state->count == 1) {
         if (state->interrupted || !state->pressed) return SINGLE_TAP;
@@ -371,17 +367,59 @@ uint8_t cur_dance(qk_tap_dance_state_t *state) {
     } else return 8; // Magic number. At some point this method will expand to work for more presses
 }
 
+//This works well if you want this key to work as a "fast modifier". It favors being held over being tapped.
+int hold_cur_dance (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (state->interrupted) {
+      if (!state->pressed) return SINGLE_TAP;
+      else return SINGLE_HOLD;
+    }
+    else {
+      if (!state->pressed) return SINGLE_TAP;
+      else return SINGLE_HOLD;
+    }
+  }
+  //If count = 2, and it has been interrupted - assume that user is trying to type the letter associated
+  //with single tap.
+  else if (state->count == 2) {
+    if (state->pressed) return DOUBLE_HOLD;
+    else return DOUBLE_TAP;
+  }
+  else if (state->count == 3) {
+    if (!state->pressed) return TRIPLE_TAP;
+    else return TRIPLE_HOLD;
+  }
+  else return 8; //magic number. At some point this method will expand to work for more presses
+}
+
 // Tap Dance definitions
-// Create an instance of 'tap' for the 'x' tap dance.
-static tap xtap_state = {
+// Create an instance of 'tap' for each tap dance.
+// see QUAD FUNCTION FOR TAB in https://github.com/qmk/qmk_firmware/blob/master/users/gordon/gordon.c
+static tap caps_ls_num_tap_state = {
+    .is_press_action = true,
+    .state = 0
+};
+
+static tap enter_rs_num_tap_state = {
+    .is_press_action = true,
+    .state = 0
+};
+
+static tap numpad_unicode_tap_state = {
+    .is_press_action = true,
+    .state = 0
+};
+
+static tap copy_cut_paste_tap_state = {
     .is_press_action = true,
     .state = 0
 };
 
 void caps_lshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
+    // 'Shift' tap dances (CAPS_LS_NUM and ENTER_RS_NUM) favor hold, with hold_cur_dance
     // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
+    caps_ls_num_tap_state.state = hold_cur_dance(state);
+    switch (caps_ls_num_tap_state.state) {
         case SINGLE_TAP: register_code(KC_CAPS); break;
         case SINGLE_HOLD: register_code(KC_LSHIFT); break;
         case DOUBLE_TAP: register_code(KC_CAPS); break;
@@ -389,26 +427,27 @@ void caps_lshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_CAPS); register_code(KC_CAPS);
+        case DOUBLE_SINGLE_TAP: tap_code(KC_CAPS); register_code(KC_CAPS); break;
     }
 }
 
 void caps_lshift_num_reset(qk_tap_dance_state_t *state, void *user_data) {
     // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    switch (xtap_state.state) {
+    switch (caps_ls_num_tap_state.state) {
         case SINGLE_TAP: unregister_code(KC_CAPS); break;
         case SINGLE_HOLD: unregister_code(KC_LSHIFT); break;
         case DOUBLE_TAP: unregister_code(KC_CAPS); break;
-        case DOUBLE_HOLD: layer_off(SYMBOLS);
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_CAPS);
+        case DOUBLE_HOLD: layer_off(SYMBOLS); break;
+        case DOUBLE_SINGLE_TAP: unregister_code(KC_CAPS); break;
     }
-    xtap_state.state = 0;
+    caps_ls_num_tap_state.state = 0;
 }
 
 void enter_rshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
+    // 'Shift' tap dances (CAPS_LS_NUM and ENTER_RS_NUM) favor hold, with hold_cur_dance
     // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
+    enter_rs_num_tap_state.state = hold_cur_dance(state);
+    switch (enter_rs_num_tap_state.state) {
         case SINGLE_TAP: register_code(KC_ENTER); break;
         case SINGLE_HOLD: register_code(KC_RSHIFT); break;
         case DOUBLE_TAP: register_code(KC_ENTER); break;
@@ -416,26 +455,26 @@ void enter_rshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER);
+        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER); break;
     }
 }
 
 void enter_rshift_num_reset(qk_tap_dance_state_t *state, void *user_data) {
     // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    switch (xtap_state.state) {
+    switch (enter_rs_num_tap_state.state) {
         case SINGLE_TAP: unregister_code(KC_ENTER); break;
         case SINGLE_HOLD: unregister_code(KC_RSHIFT); break;
         case DOUBLE_TAP: unregister_code(KC_ENTER); break;
-        case DOUBLE_HOLD: layer_off(SYMBOLS);
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER);
+        case DOUBLE_HOLD: layer_off(SYMBOLS); break;
+        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER); break;
     }
-    xtap_state.state = 0;
+    enter_rs_num_tap_state.state = 0;
 }
 
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
     // SINGLE_TAP to cycle to unicode, DOUBLE_TAP to toggle back; DOUBLE_SINGLE_TAP is a placeholder
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
+    numpad_unicode_tap_state.state = cur_dance(state);
+    switch (numpad_unicode_tap_state.state) {
         case SINGLE_TAP: register_code16(LCA(KC_SPACE)); break; // left-control-option-space: cycle through inputs
         case SINGLE_HOLD: layer_on(NUMPAD); break;
         case DOUBLE_TAP: register_code16(LCTL(KC_SPACE)); break; // left-control-space: toggle back to last input
@@ -443,26 +482,26 @@ void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER);
+        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER); break;
     }
 }
 
 void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data) {
     // SINGLE_TAP to cycle to unicode, DOUBLE_TAP to toggle back; DOUBLE_SINGLE_TAP is a placeholder
-    switch (xtap_state.state) {
+    switch (numpad_unicode_tap_state.state) {
         case SINGLE_TAP: unregister_code16(LCA(KC_SPACE)); break; // left-control-option-space: cycle through inputs
         case SINGLE_HOLD: layer_off(NUMPAD); break;
         case DOUBLE_TAP: unregister_code16(LCTL(KC_SPACE)); break; // left-control-space: toggle back to last input
-        case DOUBLE_HOLD: unregister_code(KC_LOPT); layer_off(UNICODE); // release option and back to previous layer
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER);
+        case DOUBLE_HOLD: unregister_code(KC_LOPT); layer_off(UNICODE); break; // release option and back to previous layer
+        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER); break;
     }
-    xtap_state.state = 0;
+    numpad_unicode_tap_state.state = 0;
 }
 
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data) {
     // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
+    copy_cut_paste_tap_state.state = cur_dance(state);
+    switch (copy_cut_paste_tap_state.state) {
         case SINGLE_TAP: register_code16(LCMD(KC_C)); break;  // command-c: copy
         case SINGLE_HOLD: register_code16(LCMD(KC_V)); break; // command-v: paste
         case DOUBLE_TAP: register_code16(LCMD(KC_X)); break;  // command-x: cut
@@ -470,74 +509,20 @@ void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data) {
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code16(LCMD(KC_X)); register_code16(LCMD(KC_X)); // same as double-tap
+        case DOUBLE_SINGLE_TAP: tap_code16(LCMD(KC_X)); register_code16(LCMD(KC_X)); break; // same as double-tap
     }
 }
 
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data) {
     // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    switch (xtap_state.state) {
+    switch (copy_cut_paste_tap_state.state) {
         case SINGLE_TAP: unregister_code16(LCMD(KC_C)); break;  // command-c: copy
         case SINGLE_HOLD: unregister_code16(LCMD(KC_V)); break; // command-v: paste
         case DOUBLE_TAP: unregister_code16(LCMD(KC_X)); break;  // command-x: cut
-        case DOUBLE_HOLD: unregister_code16(LCMD(KC_X));        // same as double-tap
-        case DOUBLE_SINGLE_TAP: unregister_code16(LCMD(KC_X));  // same as double-tap
+        case DOUBLE_HOLD: unregister_code16(LCMD(KC_X)); break;        // same as double-tap
+        case DOUBLE_SINGLE_TAP: unregister_code16(LCMD(KC_X)); break;  // same as double-tap
     }
-    xtap_state.state = 0;
-}
-
-void undo_redo_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
-        case SINGLE_TAP: register_code16(LCMD(KC_Z)); break;  // command-z: undo
-        case SINGLE_HOLD: register_code16(LCMD(KC_Z)); break; // same as single-tap
-        case DOUBLE_TAP: register_code16(SCMD(KC_Z)); break;  // command-shift-z: redo
-        case DOUBLE_HOLD: register_code16(SCMD(KC_Z)); break; // same as double-tap
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code16(SCMD(KC_Z)); register_code16(SCMD(KC_Z)); // same as double-tap
-    }
-}
-
-void undo_redo_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    switch (xtap_state.state) {
-        case SINGLE_TAP: unregister_code16(LCMD(KC_Z)); break;  // command-z: undo
-        case SINGLE_HOLD: unregister_code16(LCMD(KC_Z)); break; // same as single-tap
-        case DOUBLE_TAP: unregister_code16(SCMD(KC_Z)); break;  // command-shift-z: redo
-        case DOUBLE_HOLD: unregister_code16(SCMD(KC_Z));        // same as double-tap
-        case DOUBLE_SINGLE_TAP: unregister_code16(SCMD(KC_Z));  // same as double-tap
-    }
-    xtap_state.state = 0;
-}
-
-void find_replace_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
-        case SINGLE_TAP: register_code16(LCMD(KC_F)); break;  // command-f: find
-        case SINGLE_HOLD: register_code16(LCMD(KC_F)); break; // same as single-tap
-        case DOUBLE_TAP: register_code16(LOPT(LCMD(KC_F))); break;  // option-command-f: replace (as defined in vs code)
-        case DOUBLE_HOLD: register_code16(LOPT(LCMD(KC_F))); break; // same as double-tap
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code16(LOPT(LCMD(KC_F))); register_code16(LOPT(LCMD(KC_F))); // same as double-tap
-    }
-}
-
-void find_replace_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    switch (xtap_state.state) {
-        case SINGLE_TAP: unregister_code16(LCMD(KC_F)); break;  // command-f: find
-        case SINGLE_HOLD: unregister_code16(LCMD(KC_F)); break; // same as single-tap
-        case DOUBLE_TAP: unregister_code16(LOPT(LCMD(KC_F))); break;  // option-command-f: replace (as defined in vs code)
-        case DOUBLE_HOLD: unregister_code16(LOPT(LCMD(KC_F)));        // same as double-tap
-        case DOUBLE_SINGLE_TAP: unregister_code16(LOPT(LCMD(KC_F)));  // same as double-tap
-    }
-    xtap_state.state = 0;
+    copy_cut_paste_tap_state.state = 0;
 }
 
 qk_tap_dance_action_t tap_dance_actions[] = {
@@ -545,8 +530,8 @@ qk_tap_dance_action_t tap_dance_actions[] = {
     [ENTER_RS_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, enter_rshift_num_finished, enter_rshift_num_reset),
     [NUMPAD_UNICODE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_unicode_finished, numpad_unicode_reset),
     [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
-    [UNDO_REDO] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, undo_redo_finished, undo_redo_reset),
-    [FIND_REPLACE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, find_replace_finished, find_replace_reset),
+    [UNDO_REDO] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_Z), SCMD(KC_Z)),
+    [FIND_REPLACE] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_F), LOPT(LCMD(KC_F))),
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -565,7 +550,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
-
 
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
