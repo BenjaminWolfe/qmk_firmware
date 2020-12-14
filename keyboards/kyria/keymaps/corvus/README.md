@@ -17,3 +17,10 @@
   once I get used to keeping my fingers exactly where they are.
   After all, who likes to stretch their pinky all the way up there,
   and as often as all that?
+
+# Ecosystem
+
+* Get a longer TRRS cable so as to be able to move the halves of the keyboard
+  farther apart.
+* Figure out how to actually place my hands farther apart at my desk…
+  like a very wide keyboard tray.
