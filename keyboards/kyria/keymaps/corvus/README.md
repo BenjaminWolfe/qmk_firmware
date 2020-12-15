@@ -1,6 +1,9 @@
 # Open Tasks and Ideas
 
 * Continue moving away from double taps in favor of chording.
+* Although consider tweaking, as at COMBO_TERM 100 the functionality fires chords
+  when I intend a quick roll. 50 seems to work nicely.
+* Tap-dance term could use some tweaking, though, if I continue using the functionality.
 * Command-shift-x for 1Password?
 * Reconsider placement of the control key, and all use of that innermost thumb position.
 * Nicer use of layer colors.

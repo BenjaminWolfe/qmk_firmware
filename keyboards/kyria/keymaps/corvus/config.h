@@ -18,7 +18,7 @@
 
 // https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
 #define COMBO_COUNT 2
-#define COMBO_TERM 100
+#define COMBO_TERM 50
 
 #ifdef OLED_DRIVER_ENABLE
   #define OLED_DISPLAY_128X64
