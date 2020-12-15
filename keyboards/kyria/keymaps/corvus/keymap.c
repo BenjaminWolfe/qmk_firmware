@@ -1,5 +1,3 @@
-// TODO: maybe move tabs in chrome and vscode layers
-
 /* Copyright 2019 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -221,6 +219,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Page up and down are not much used on a Mac, or even home and end.
  * Duplicated down arrow because I always forget it's in the home row.
  * Duplicated left and right arrows in the thumb row by analogy to backspace and delete in the default layer.
+ * Duplicated tab for the sake of command-tab window-switching.
  * use CHROME and VSCODE layers to navigate between tabs
  * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
  * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
@@ -229,7 +228,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |Command|  Opt  | Shift |       |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |         |       |Command|  Opt  | Shift |  Tab  |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
  * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
@@ -241,7 +240,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NAV] = LAYOUT(
       _______, _______, _______,           MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            _______,                                     _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            KC_TAB,                                      _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
       _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
                                            _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
