@@ -3,16 +3,11 @@
 * Consider moving away from double taps in favor of chording, sometimes.
 * Fix the navigation functionality especially around editing,
   with command, option, shift, and the number keys.
-* Move at least the copy/cut/paste shortcuts to the _left_ hand,
-  so that they can be used in concert with a mouse.
-* Reconsider the navigation functionality also of where the arrow keys live.
-  It seemed intuitive to have left and right on the thumb,
-  but up and down... it wasn't as clever as it sounded in my head.
 * Control down, if not control up, for Mac use.
   (Edit: Actually it's fine because you can start with command-tab either way.)
 * Command-shift-x for LastPass?
 * Fix caps lock at the bottom left corner.
-* Reconsider placement of the control key, and all use of that innermost thumb position.'
+* Reconsider placement of the control key, and all use of that innermost thumb position.
 * Nicer use of layer colors.
 * More intentional arrangement of RGB, media, and function keys.
 * Reduce file size to be able to use the leader key functionality.

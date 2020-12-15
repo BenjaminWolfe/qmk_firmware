@@ -102,7 +102,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Caps Lock is duplicated because it does not appear to be working yet in CAPS_LS_NUM
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |Backspace|
+ * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
@@ -111,15 +111,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |  Shift  |   Z   |   X   |   C   |   V   |   B   |       |CapsLck|  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Shift  |
  * | SYMBOLS |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       | SYMBOLS |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |  NAV  |NUMBERS|  |       |  - _  | Space |  Del  |       |
+ *                           |       |       | Space |  NAV  |NUMBERS|  |       |Backspc| Space |  Del  |       |
  *                           |Control|  Opt  |Command|NAV/Tab|UNICODE|  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_BSPC,
+      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
       KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                 KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
       TD(CAPS_LS_NUM), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______,     KC_CAPS,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD(ENTER_RS_NUM),
-                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_MINS, KC_SPC, KC_DEL,  _______
+                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
@@ -217,23 +217,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * FIND_REPLACE: tap to find (command-f), double-tap to replace (command-option-f, as defined in VS Code defaults).
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * |         |       |       |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |                                  |       |  Cpy  | Undo  | Find  |       |         |
- * |         |       |       |VSCODE |CHROME |       |                                  |       |  Cut  | Redo  | Repl  |       |         |
- * |         |       |       |       |       |       |                                  |       | Paste |       |       |       |         |
+ * |         |       |Command|  Opt  | Shift |       |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |   ↑   |   ←   |   →   |   ↓   |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      _______, _______, _______, _______,    _______,    _______,                                     _______, _______,            _______,       _______,          _______, _______,
-      _______, _______, _______, MO(VSCODE), MO(CHROME), _______,                                     _______, TD(COPY_CUT_PASTE), TD(UNDO_REDO), TD(FIND_REPLACE), _______, _______,
-      _______, _______, _______, _______,    _______,    _______, _______, _______, _______, _______, _______, _______,            _______,       _______,          _______, _______,
-                                 _______,    _______,    _______, _______, _______, KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,            _______
+      _______, _______, _______,           MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
+      _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            _______,                                     _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                           _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
   * Chrome
