@@ -1,3 +1,5 @@
+// TODO: do chording for number input, maybe move tabs in chrome and vscode layers
+
 /* Copyright 2019 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -85,7 +87,9 @@ enum layers {
 
 // on KC_BKTK_ESCAPE, compare KC_CCCV from https://github.com/BenjaminWolfe/qmk_firmware/blob/master/keyboards/kyria/keymaps/thomasbaart/keymap.c
 enum custom_keycodes {
-    KC_BKTK_ESCAPE = SAFE_RANGE
+    KC_BKTK_ESCAPE = SAFE_RANGE,
+    KC_CYCLE_INPUTS,
+    KC_TOGGLE_INPUTS
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -156,14 +160,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   |   F   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |   0   |       |       |
+ *                           |       |       |       |       |       |  | Toggl | Cycle |   0   |       |       |
+ *                           |       |       |       |       |       |  | Inpts | Inpts |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [UNICODE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                      KC_A,    KC_KP_7, KC_KP_8, KC_KP_9, KC_D, _______,
-      _______, _______, _______, _______, _______, _______,                                      KC_B,    KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,  KC_C,    KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
-                                 _______, _______, _______, _______, _______, _______, _______,  KC_KP_0, _______, _______
+      _______, _______, _______, _______, _______, _______,                                                      KC_A,    KC_KP_7, KC_KP_8, KC_KP_9, KC_D, _______,
+      _______, _______, _______, _______, _______, _______,                                                      KC_B,    KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,         KC_C,    KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
+                                 _______, _______, _______, _______, _______, KC_TOGGLE_INPUTS, KC_CYCLE_INPUTS, KC_KP_0, _______, _______
     ),
 /*
  * Common Coding Symbols
@@ -210,7 +215,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Navigation Layer
  * Page up and down are not much used on a Mac, or even home and end.
- * Up, left, right, and down are placed, not for gaming, but for editing in top-down, left-to-right contexts.
+ * Duplicated down arrow because I always forget it's in the home row.
  * use CHROME and VSCODE layers to navigate between tabs
  * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
  * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
@@ -222,7 +227,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |       |Command|  Opt  | Shift |       |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
- * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
  * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |       |       |       |
@@ -232,7 +237,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [NAV] = LAYOUT(
       _______, _______, _______,           MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
       _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            _______,                                     _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
                                            _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
@@ -483,28 +488,29 @@ void enter_rshift_num_reset(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // SINGLE_TAP to cycle to unicode, DOUBLE_TAP to toggle back; DOUBLE_SINGLE_TAP is a placeholder
-    numpad_unicode_tap_state.state = cur_dance(state);
+    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
+    // favors hold, with hold_cur_dance
+    numpad_unicode_tap_state.state = hold_cur_dance(state);
     switch (numpad_unicode_tap_state.state) {
-        case SINGLE_TAP: register_code16(LCA(KC_SPACE)); break; // left-control-option-space: cycle through inputs
+        case SINGLE_TAP: layer_on(NUMPAD); break; // same as single-hold
         case SINGLE_HOLD: layer_on(NUMPAD); break;
-        case DOUBLE_TAP: register_code16(LCTL(KC_SPACE)); break; // left-control-space: toggle back to last input
+        case DOUBLE_TAP: layer_on(UNICODE); register_code(KC_LOPT); break; // same as double hold
         case DOUBLE_HOLD: layer_on(UNICODE); register_code(KC_LOPT); break; // unicode pad on right with option pressed
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER); break;
+        case DOUBLE_SINGLE_TAP: layer_on(UNICODE); register_code(KC_LOPT); break; // same as double hold
     }
 }
 
 void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // SINGLE_TAP to cycle to unicode, DOUBLE_TAP to toggle back; DOUBLE_SINGLE_TAP is a placeholder
+    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
     switch (numpad_unicode_tap_state.state) {
-        case SINGLE_TAP: unregister_code16(LCA(KC_SPACE)); break; // left-control-option-space: cycle through inputs
+        case SINGLE_TAP: layer_off(NUMPAD); break;
         case SINGLE_HOLD: layer_off(NUMPAD); break;
-        case DOUBLE_TAP: unregister_code16(LCTL(KC_SPACE)); break; // left-control-space: toggle back to last input
-        case DOUBLE_HOLD: unregister_code(KC_LOPT); layer_off(UNICODE); break; // release option and back to previous layer
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER); break;
+        case DOUBLE_TAP: unregister_code(KC_LOPT); layer_off(UNICODE); break;
+        case DOUBLE_HOLD: unregister_code(KC_LOPT); layer_off(UNICODE); break;
+        case DOUBLE_SINGLE_TAP: unregister_code(KC_LOPT); layer_off(UNICODE); break;
     }
     numpad_unicode_tap_state.state = 0;
 }
@@ -585,6 +591,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else { // Tap, backtick
                     tap_code16(KC_GRAVE);
                 }
+            }
+            break;
+        case KC_CYCLE_INPUTS:
+            if (record->event.pressed) {
+                // on press: control-option-space
+                // only accessed from UNICODE layer, where option is already depressed
+                // then option key up and down to reset for unicode keystrokes
+                SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
+            } else {
+                // on release: nothing
+            }
+            break;
+        case KC_TOGGLE_INPUTS:
+            if (record->event.pressed) {
+                // on press: control-space
+                // only accessed from UNICODE layer, where option is already depressed
+                SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
+            } else {
+                // on release: nothing
             }
             break;
     }

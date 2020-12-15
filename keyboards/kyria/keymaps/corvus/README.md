@@ -5,7 +5,7 @@
   with command, option, shift, and the number keys.
 * Control down, if not control up, for Mac use.
   (Edit: Actually it's fine because you can start with command-tab either way.)
-* Command-shift-x for LastPass?
+* Command-shift-x for 1Password?
 * Fix caps lock at the bottom left corner.
 * Reconsider placement of the control key, and all use of that innermost thumb position.
 * Nicer use of layer colors.
