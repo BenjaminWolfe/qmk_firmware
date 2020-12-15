@@ -44,8 +44,7 @@ enum {
     NUMPAD_UNICODE,
     COPY_CUT_PASTE,
     UNDO_REDO,
-    FIND_REPLACE,
-    NAV_TAB
+    FIND_REPLACE
 };
 
 uint8_t cur_dance(qk_tap_dance_state_t *state);
@@ -57,10 +56,8 @@ void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
 
-void nav_tab_finished(qk_tap_dance_state_t *state, void *user_data);
-void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data);
-
 uint16_t copy_paste_timer;
+static uint8_t command_tracker;
 
 // https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
 #ifdef COMBO_ENABLE
@@ -95,7 +92,9 @@ enum layers {
 enum custom_keycodes {
     KC_BKTK_ESCAPE = SAFE_RANGE,
     KC_CYCLE_INPUTS,
-    KC_TOGGLE_INPUTS
+    KC_TOGGLE_INPUTS,
+    KC_NAV,
+    KC_SWITCH
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -103,7 +102,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  * Resting middle position of each thumb is spacebar; on left, hold for command key
  * Shift: tap bottom left corner for caps lock, hold for shift; tap bottom right for enter, hold for shift
- * NAV_TAB: hold for NAV layer; tap and hold for NAV layer, with command depressed, starting with Tab press + release (for window switching)
  * NUMPAD_UNICODE: hold for numpad; tap and hold for UNICODE layer (modded with option key);
  * KC_BKTK_ESCAPE: tap for backtick, hold briefly for escape
  * combo of index and middle (either hand) to use SYMBOLS layer
@@ -118,14 +116,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |  Shift  |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Shift  |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       | Space |  NAV  |NUMBERS|  |       |Backspc| Space |  Del  |       |
- *                           |Control|  Opt  |Command|NAV/Tab|UNICODE|  | ADJST |       |       |       |       |
+ *                           |Control|  Opt  |Command|       |UNICODE|  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
-      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                 KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______,     _______,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
-                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                             KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
+      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                             KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
+                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), KC_NAV,  TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
@@ -219,16 +217,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Page up and down are not much used on a Mac, or even home and end.
  * Duplicated down arrow because I always forget it's in the home row.
  * Duplicated left and right arrows in the thumb row by analogy to backspace and delete in the default layer.
- * Duplicated tab for the sake of command-tab window-switching.
+ * KC_SWITCH is for switching tabs on a Mac.
+ *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
+ *     Any other time it will just press tab.
+ *     Command will be released when dropping out of the layer.
  * use CHROME and VSCODE layers to navigate between tabs
  * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
  * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
  * FIND_REPLACE: tap to find (command-f), double-tap to replace (command-option-f, as defined in VS Code defaults).
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
+ * |         | Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |Command|  Opt  | Shift |  Tab  |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |         |       |Command|  Opt  | Shift | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
  * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
@@ -239,10 +240,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      _______, _______, _______,           MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            KC_TAB,                                      _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
-                                           _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
+      _______, LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
+      _______, _______,    KC_LCMD,          KC_LOPT,       KC_LSFT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______, _______,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
+                                             _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
  /*
   * Chrome
@@ -250,19 +251,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+  * |         |       |       |       |       |       |                                  |       |  Nxt  |       |  Lst  |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       |       |       |  |       | Prev  | Next  |       |       |
-  *                           |       |       |       |       |       |  |       |  Tab  |  Tab  |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [CHROME] = LAYOUT(
-       _______, _______, _______, _______, _______, _______,                                        _______,    _______, _______, _______, _______, _______,
-       _______, _______, _______, _______, _______, _______,                                        _______,    _______, _______, _______, _______, _______,
-       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,    _______,    _______, _______, _______, _______, _______,
-                                  _______, _______, _______, _______, _______, _______, C(KC_PGUP), C(KC_PGDN), _______, _______
+       _______, _______, _______, _______, _______, _______,                                     _______, _______,    _______, _______,    _______, _______,
+       _______, _______, _______, _______, _______, _______,                                     _______, C(KC_PGUP), _______, C(KC_PGDN), _______, _______,
+       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,    _______, _______,    _______, _______,
+                                  _______, _______, _______, _______, _______, _______, _______, _______, _______,    _______
      ),
  /*
   * VS Code
@@ -270,19 +271,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+  * |         |       |       |       |       |       |                                  |       |  Nxt  |       |  Lst  |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       |       |       |  |       | Prev  | Next  |       |       |
-  *                           |       |       |       |       |       |  |       |  Tab  |  Tab  |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [VSCODE] = LAYOUT(
-       _______, _______, _______, _______, _______, _______,                                                 _______,             _______, _______, _______, _______, _______,
-       _______, _______, _______, _______, _______, _______,                                                 _______,             _______, _______, _______, _______, _______,
-       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,             _______,             _______, _______, _______, _______, _______,
-                                  _______, _______, _______, _______, _______, _______, LOPT(LCMD(KC_LEFT)), LOPT(LCMD(KC_RGHT)), _______, _______
+       _______, _______, _______, _______, _______, _______,                                     _______, _______,             _______, _______,             _______, _______,
+       _______, _______, _______, _______, _______, _______,                                     _______, LOPT(LCMD(KC_LEFT)), _______, LOPT(LCMD(KC_RGHT)), _______, _______,
+       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,             _______, _______,             _______, _______,
+                                  _______, _______, _______, _______, _______, _______, _______, _______, _______,             _______
      ),
 /*
  * Adjust Layer
@@ -420,11 +421,6 @@ static tap copy_cut_paste_tap_state = {
     .state = 0
 };
 
-static tap nav_tab_tap_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
     // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
     // favors hold, with hold_cur_dance
@@ -480,38 +476,9 @@ void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data) {
     copy_cut_paste_tap_state.state = 0;
 }
 
-void nav_tab_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // favors hold, with hold_cur_dance
-    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
-    nav_tab_tap_state.state = hold_cur_dance(state);
-    switch (nav_tab_tap_state.state) {
-        case SINGLE_TAP: break;
-        case SINGLE_HOLD: layer_on(NAV); break;
-        case DOUBLE_TAP: break;
-        case DOUBLE_HOLD: layer_on(NAV); register_code(KC_LCMD); tap_code(KC_TAB); break;
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: break;
-    }
-}
-
-void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
-    switch (nav_tab_tap_state.state) {
-        case SINGLE_TAP: break;
-        case SINGLE_HOLD: layer_off(NAV); break;
-        case DOUBLE_TAP: break;
-        case DOUBLE_HOLD: unregister_code(KC_LCMD); layer_off(NAV); break;
-        case DOUBLE_SINGLE_TAP: break;
-    }
-    nav_tab_tap_state.state = 0;
-}
-
 qk_tap_dance_action_t tap_dance_actions[] = {
     [NUMPAD_UNICODE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_unicode_finished, numpad_unicode_reset),
     [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
-    [NAV_TAB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, nav_tab_finished, nav_tab_reset),
     [UNDO_REDO] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_Z), SCMD(KC_Z)),
     [FIND_REPLACE] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_F), LOPT(LCMD(KC_F))),
 };
@@ -544,6 +511,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // on press: control-space
                 // only accessed from UNICODE layer, where option is already depressed
                 SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
+            } else {
+                // on release: nothing
+            }
+            break;
+        case KC_NAV:
+            if (record->event.pressed) {
+                // on press: turn NAV layer on
+                layer_on(NAV);
+            } else {
+                // on release: turn NAV layer off, *and release command if needed*,
+                // in case KC_SWITCH depressed it for window-switching (see below)
+                if (command_tracker) {
+                    unregister_code(KC_LCMD);
+                    command_tracker--;
+                }
+                layer_off(NAV);
+            }
+            break;
+        case KC_SWITCH:
+            if (record->event.pressed) {
+                // on press: depress command if not already depressed; tap tab
+                if (!command_tracker) {
+                    register_code(KC_LCMD);
+                    command_tracker++;
+                }
+                tap_code(KC_TAB);
             } else {
                 // on release: nothing
             }
