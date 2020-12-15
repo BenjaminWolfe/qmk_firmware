@@ -1,4 +1,4 @@
-// TODO: do chording for number input, maybe move tabs in chrome and vscode layers
+// TODO: maybe move tabs in chrome and vscode layers
 
 /* Copyright 2019 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
  *
@@ -43,8 +43,6 @@ enum {
 
 // Tap dance enums
 enum {
-    CAPS_LS_NUM,
-    ENTER_RS_NUM,
     NUMPAD_UNICODE,
     COPY_CUT_PASTE,
     UNDO_REDO,
@@ -55,12 +53,6 @@ enum {
 uint8_t cur_dance(qk_tap_dance_state_t *state);
 
 // For each advanced tap dance. Put these here so they can be used in any keymap
-void caps_lshift_num_finished(qk_tap_dance_state_t *state, void *user_data);
-void caps_lshift_num_reset(qk_tap_dance_state_t *state, void *user_data);
-
-void enter_rshift_num_finished(qk_tap_dance_state_t *state, void *user_data);
-void enter_rshift_num_reset(qk_tap_dance_state_t *state, void *user_data);
-
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data);
 void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
 
@@ -71,6 +63,22 @@ void nav_tab_finished(qk_tap_dance_state_t *state, void *user_data);
 void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data);
 
 uint16_t copy_paste_timer;
+
+// https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
+#ifdef COMBO_ENABLE
+enum combos {
+  ST_SYMBOLS,
+  NE_SYMBOLS
+};
+
+const uint16_t PROGMEM st_combo[] = {KC_S, KC_T, COMBO_END};
+const uint16_t PROGMEM ne_combo[] = {KC_N, KC_E, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {
+  [ST_SYMBOLS] = COMBO_ACTION(st_combo),
+  [NE_SYMBOLS] = COMBO_ACTION(ne_combo),
+};
+#endif
 
 // TODO: Make the layers match the enum.
 enum layers {
@@ -96,14 +104,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* 
  * Base Layer: COLEMAK
  * Resting middle position of each thumb is spacebar; on left, hold for command key
+ * Shift: tap bottom left corner for caps lock, hold for shift; tap bottom right for enter, hold for shift
  * NAV_TAB: hold for NAV layer; tap and hold for NAV layer, with command depressed, starting with Tab press + release (for window switching)
- * NUMPAD_UNICODE:
- *     hold for numpad; tap to cycle input modes (on Mac) to get to Unicode;
- *     tap and hold for UNICODE layer (modded with option key); double-tap to toggle input mode back (on Mac)
- * KC_BKTK_ESCAPE: tap for backtick, hold for escape
- * CAPS_LS_NUM: tap for caps lock, hold for shift, tap and hold for SYMBOLS layer
- * ENTER_RS_NUM: tap for enter, hold for shift, tap and hold for SYMBOLS layer
- * Caps Lock is duplicated because it does not appear to be working yet in CAPS_LS_NUM
+ * NUMPAD_UNICODE: hold for numpad; tap and hold for UNICODE layer (modded with option key);
+ * KC_BKTK_ESCAPE: tap for backtick, hold briefly for escape
+ * combo of index and middle (either hand) to use SYMBOLS layer
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
@@ -111,19 +116,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |Caps Lock|       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Enter  |
- * |  Shift  |   Z   |   X   |   C   |   V   |   B   |       |CapsLck|  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Shift  |
- * | SYMBOLS |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       | SYMBOLS |
+ * |Caps Lock|   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
+ * |  Shift  |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Shift  |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       | Space |  NAV  |NUMBERS|  |       |Backspc| Space |  Del  |       |
  *                           |Control|  Opt  |Command|NAV/Tab|UNICODE|  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
-      KC_TAB,          KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                 KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      TD(CAPS_LS_NUM), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______,     KC_CAPS,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD(ENTER_RS_NUM),
-                                         KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                                 KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
+      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                                 KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______,     _______,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
+                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), TD(NAV_TAB), TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
@@ -193,12 +197,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  /*
   * Numbers and Symbols
   * Shows numbers and symbols in a modified top-row pattern, for password muscle memory and such
-  * No room for plus and equal sign.
+  * Pinky gets plus and equal sign because hyphen/underscore are already on the default layer.
   *
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
-  * |    ~    |   !   |   @   |   #   |   $   |   %   |                                  |   ^   |   &   |   *   |   (   |   )   |    _    |
+  * |    ~    |   !   |   @   |   #   |   $   |   %   |                                  |   ^   |   &   |   *   |   (   |   )   |    +    |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |    `    |   1   |   2   |   3   |   4   |   5   |                                  |   6   |   7   |   8   |   9   |   0   |    -    |
+  * |    `    |   1   |   2   |   3   |   4   |   5   |                                  |   6   |   7   |   8   |   9   |   0   |    =    |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -207,8 +211,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [SYMBOLS] = LAYOUT(
-       KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_UNDS,
-       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS,   
+       KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_PLUS,
+       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_KP_EQUAL,   
        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
@@ -216,6 +220,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Navigation Layer
  * Page up and down are not much used on a Mac, or even home and end.
  * Duplicated down arrow because I always forget it's in the home row.
+ * Duplicated left and right arrows in the thumb row by analogy to backspace and delete in the default layer.
  * use CHROME and VSCODE layers to navigate between tabs
  * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
  * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
@@ -230,7 +235,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
  * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |   ←   |       |   →   |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -238,7 +243,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______,           MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
       _______, _______, KC_LCMD,           KC_LOPT,       KC_LSFT,            _______,                                     _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
       _______, _______, TD(FIND_REPLACE),  TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
-                                           _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
+                                           _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
  /*
   * Chrome
@@ -406,16 +411,6 @@ int hold_cur_dance (qk_tap_dance_state_t *state) {
 // Tap Dance definitions
 // Create an instance of 'tap' for each tap dance.
 // see QUAD FUNCTION FOR TAB in https://github.com/qmk/qmk_firmware/blob/master/users/gordon/gordon.c
-static tap caps_ls_num_tap_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
-static tap enter_rs_num_tap_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
 static tap numpad_unicode_tap_state = {
     .is_press_action = true,
     .state = 0
@@ -430,62 +425,6 @@ static tap nav_tab_tap_state = {
     .is_press_action = true,
     .state = 0
 };
-
-void caps_lshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // 'Shift' tap dances (CAPS_LS_NUM and ENTER_RS_NUM) favor hold, with hold_cur_dance
-    // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    caps_ls_num_tap_state.state = hold_cur_dance(state);
-    switch (caps_ls_num_tap_state.state) {
-        case SINGLE_TAP: register_code(KC_CAPS); break;
-        case SINGLE_HOLD: register_code(KC_LSHIFT); break;
-        case DOUBLE_TAP: register_code(KC_CAPS); break;
-        case DOUBLE_HOLD: layer_on(SYMBOLS); break;
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_CAPS); register_code(KC_CAPS); break;
-    }
-}
-
-void caps_lshift_num_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    switch (caps_ls_num_tap_state.state) {
-        case SINGLE_TAP: unregister_code(KC_CAPS); break;
-        case SINGLE_HOLD: unregister_code(KC_LSHIFT); break;
-        case DOUBLE_TAP: unregister_code(KC_CAPS); break;
-        case DOUBLE_HOLD: layer_off(SYMBOLS); break;
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_CAPS); break;
-    }
-    caps_ls_num_tap_state.state = 0;
-}
-
-void enter_rshift_num_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // 'Shift' tap dances (CAPS_LS_NUM and ENTER_RS_NUM) favor hold, with hold_cur_dance
-    // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    enter_rs_num_tap_state.state = hold_cur_dance(state);
-    switch (enter_rs_num_tap_state.state) {
-        case SINGLE_TAP: register_code(KC_ENTER); break;
-        case SINGLE_HOLD: register_code(KC_RSHIFT); break;
-        case DOUBLE_TAP: register_code(KC_ENTER); break;
-        case DOUBLE_HOLD: layer_on(SYMBOLS); break;
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code(KC_ENTER); register_code(KC_ENTER); break;
-    }
-}
-
-void enter_rshift_num_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_TAP and DOUBLE_SINGLE_TAP are placeholders
-    switch (enter_rs_num_tap_state.state) {
-        case SINGLE_TAP: unregister_code(KC_ENTER); break;
-        case SINGLE_HOLD: unregister_code(KC_RSHIFT); break;
-        case DOUBLE_TAP: unregister_code(KC_ENTER); break;
-        case DOUBLE_HOLD: layer_off(SYMBOLS); break;
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_ENTER); break;
-    }
-    enter_rs_num_tap_state.state = 0;
-}
 
 void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
     // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
@@ -571,8 +510,6 @@ void nav_tab_reset(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [CAPS_LS_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, caps_lshift_num_finished, caps_lshift_num_reset),
-    [ENTER_RS_NUM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, enter_rshift_num_finished, enter_rshift_num_reset),
     [NUMPAD_UNICODE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_unicode_finished, numpad_unicode_reset),
     [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
     [NAV_TAB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, nav_tab_finished, nav_tab_reset),
@@ -615,6 +552,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
+
+// https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
+#ifdef COMBO_ENABLE
+void process_combo_event(uint16_t combo_index, bool pressed) {
+  switch(combo_index) {
+    case ST_SYMBOLS:
+      if (pressed) {
+        // on press
+        layer_on(SYMBOLS);
+      } else {
+        // on release
+        layer_off(SYMBOLS);
+      }
+      break;
+    case NE_SYMBOLS:
+      if (pressed) {
+        // on press
+        layer_on(SYMBOLS);
+      } else {
+        // on release
+        layer_off(SYMBOLS);
+      }
+      break;
+  }
+}
+#endif
 
 #ifdef LEADER_ENABLE
 bool is_alt_tab_active = false;
