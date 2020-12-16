@@ -41,7 +41,6 @@ enum {
 
 // Tap dance enums
 enum {
-    NUMPAD_UNICODE,
     COPY_CUT_PASTE,
     UNDO_REDO,
     FIND_REPLACE
@@ -50,9 +49,6 @@ enum {
 uint8_t cur_dance(qk_tap_dance_state_t *state);
 
 // For each advanced tap dance. Put these here so they can be used in any keymap
-void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data);
-void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data);
-
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
 
@@ -91,6 +87,7 @@ enum layers {
 // on KC_BKTK_ESCAPE, compare KC_CCCV from https://github.com/BenjaminWolfe/qmk_firmware/blob/master/keyboards/kyria/keymaps/thomasbaart/keymap.c
 enum custom_keycodes {
     KC_BKTK_ESCAPE = SAFE_RANGE,
+    KC_UNICODE,
     KC_CYCLE_INPUTS,
     KC_TOGGLE_INPUTS,
     KC_NAV,
@@ -102,56 +99,56 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  * Resting middle position of each thumb is spacebar; on left, hold for command key
  * Shift: tap bottom left corner for caps lock, hold for shift; tap bottom right for enter, hold for shift
- * NUMPAD_UNICODE: hold for numpad; tap and hold for UNICODE layer (modded with option key);
  * KC_BKTK_ESCAPE: tap for backtick, hold briefly for escape
  * combo of index and middle (either hand) to use SYMBOLS layer
+ * asterisked letters are those I prefer not to use in mod-tap combinations (see readme)
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
+ * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |  *L*  |  *U*  |  *Y*  |  ; :  |   - _   |
  * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
+ * |   Tab   |  *A*  |   R   |  *S*  |   T   |   D   |                                  |   H   |  *N*  |  *E*  |  *I*  |  *O*  |   ' "   |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |Caps Lock|   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
+ * |Caps Lock|  *Z*  |   X   |  *C*  |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |  Shift  |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Shift  |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |  NAV  |NUMBERS|  |       |Backspc| Space |  Del  |       |
- *                           |Control|  Opt  |Command|       |UNICODE|  | ADJST |       |       |       |       |
+ *                           |       |       | Space |  NAV  | NUMPD |  |       |Backspc| Space |  Del  |       |
+ *                           |Control|  Opt  |Command|       |       |  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                             KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
-      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                             KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,            _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
-                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), KC_NAV,  TD(NUMPAD_UNICODE), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                     KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
+      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                     KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,    _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
+                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), KC_NAV,  MO(NUMPAD), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
     ),
 /*
  * Modified Number Pad
  * intended primarily for *entering numerical values*
- * uses KC_# (0-9) instead of KC_KP_# b/c it allows memorable placement of familiar symbols, and numpad is rarely used on a Mac
- * uses KC_MINUS instead of KC_KP_MINUS for the sake of en-dash and em-dash on Mac (using option and shift-option)
+ * all symbols can be found in familiar locations on the SYMBOLS layer
+ * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
  * use CODING layer for easy entering of parens, brackets, curly braces, slashes, and pipe
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |   =   |  7 &  |  8 *  |  9 (  |   /   |         |
+ * |         |       |       |       |       |       |                                  |   =   |   7   |   8   |   9   |   /   |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |  Opt  | Shift | CODNG |       |                                  |   +   |  4 $  |  5 %  |  6 ^  |   *   |         |
+ * |         |       |       |UNICODE| CODNG |       |                                  |   +   |   4   |   5   |   6   |   *   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |   (   |  1 !  |  2 @  |  3 #  |   )   |         |
+ * |         |       |       |       |       |       |       |       |  |       |       |   (   |   1   |   2   |   3   |   )   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |   ,   |  - _  |  0 )  |   .   |       |
+ *                           |       |       |       |       |       |  |   ,   |   -   |   0   |   .   |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMPAD] = LAYOUT(
-      _______, _______, _______, _______, _______,    _______,                                          KC_KP_EQUAL, KC_7,      KC_8,   KC_9,   KC_KP_SLASH,    _______,
-      _______, _______, KC_LOPT, KC_LSFT, MO(CODING), _______,                                          KC_KP_PLUS,  KC_4,      KC_5,   KC_6,   KC_KP_ASTERISK, _______,
-      _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______,  KC_LPRN,     KC_1,      KC_2,   KC_3,   KC_RIGHT_PAREN, _______,
-                                 _______, _______,    _______, _______, _______, KC_KP_COMMA, KC_MINUS, KC_0,        KC_KP_DOT, _______
+      _______, _______, _______, _______,    _______,    _______,                                             KC_KP_EQUAL, KC_KP_7,   KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
+      _______, _______, _______, KC_UNICODE, MO(CODING), _______,                                             KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
+      _______, _______, _______, _______,    _______,    _______, _______, _______, _______,     _______,     KC_LPRN,     KC_KP_1,   KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
+                                 _______,    _______,    _______, _______, _______, KC_KP_COMMA, KC_KP_MINUS, KC_KP_0,     KC_KP_DOT, _______
     ),
 /*
  * Unicode Pad
  * intended primarily for *entering unicode hex values*
- * NUMPAD_UNICODE on the Colemak layer, when tapped and held, will activate this layer *and hold the option key*
+ * KC_UNICODE on the NUMPAD layer, when tapped and held, will activate this layer *and hold the option key*
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   |   D   |         |
@@ -383,71 +380,13 @@ uint8_t cur_dance(qk_tap_dance_state_t *state) {
     } else return 8; // Magic number. At some point this method will expand to work for more presses
 }
 
-//This works well if you want this key to work as a "fast modifier". It favors being held over being tapped.
-int hold_cur_dance (qk_tap_dance_state_t *state) {
-  if (state->count == 1) {
-    if (state->interrupted) {
-      if (!state->pressed) return SINGLE_TAP;
-      else return SINGLE_HOLD;
-    }
-    else {
-      if (!state->pressed) return SINGLE_TAP;
-      else return SINGLE_HOLD;
-    }
-  }
-  //If count = 2, and it has been interrupted - assume that user is trying to type the letter associated
-  //with single tap.
-  else if (state->count == 2) {
-    if (state->pressed) return DOUBLE_HOLD;
-    else return DOUBLE_TAP;
-  }
-  else if (state->count == 3) {
-    if (!state->pressed) return TRIPLE_TAP;
-    else return TRIPLE_HOLD;
-  }
-  else return 8; //magic number. At some point this method will expand to work for more presses
-}
-
 // Tap Dance definitions
 // Create an instance of 'tap' for each tap dance.
 // see QUAD FUNCTION FOR TAB in https://github.com/qmk/qmk_firmware/blob/master/users/gordon/gordon.c
-static tap numpad_unicode_tap_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
 static tap copy_cut_paste_tap_state = {
     .is_press_action = true,
     .state = 0
 };
-
-void numpad_unicode_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
-    // favors hold, with hold_cur_dance
-    numpad_unicode_tap_state.state = hold_cur_dance(state);
-    switch (numpad_unicode_tap_state.state) {
-        case SINGLE_TAP: layer_on(NUMPAD); break; // same as single-hold
-        case SINGLE_HOLD: layer_on(NUMPAD); break;
-        case DOUBLE_TAP: layer_on(UNICODE); register_code(KC_LOPT); break; // same as double hold
-        case DOUBLE_HOLD: layer_on(UNICODE); register_code(KC_LOPT); break; // unicode pad on right with option pressed
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: layer_on(UNICODE); register_code(KC_LOPT); break; // same as double hold
-    }
-}
-
-void numpad_unicode_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // SINGLE_TAP, DOUBLE_TAP, and DOUBLE_SINGLE_TAP are placeholders
-    switch (numpad_unicode_tap_state.state) {
-        case SINGLE_TAP: layer_off(NUMPAD); break;
-        case SINGLE_HOLD: layer_off(NUMPAD); break;
-        case DOUBLE_TAP: unregister_code(KC_LOPT); layer_off(UNICODE); break;
-        case DOUBLE_HOLD: unregister_code(KC_LOPT); layer_off(UNICODE); break;
-        case DOUBLE_SINGLE_TAP: unregister_code(KC_LOPT); layer_off(UNICODE); break;
-    }
-    numpad_unicode_tap_state.state = 0;
-}
 
 void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data) {
     // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
@@ -477,7 +416,6 @@ void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [NUMPAD_UNICODE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, numpad_unicode_finished, numpad_unicode_reset),
     [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
     [UNDO_REDO] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_Z), SCMD(KC_Z)),
     [FIND_REPLACE] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_F), LOPT(LCMD(KC_F))),
@@ -494,6 +432,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else { // Tap, backtick
                     tap_code16(KC_GRAVE);
                 }
+            }
+            break;
+        case KC_UNICODE:
+            if (record->event.pressed) {
+                // on press: switch to UNICODE layer, depress option and leave it down
+                layer_on(UNICODE);
+                SEND_STRING(SS_DOWN(X_LOPT));
+            } else {
+                // on release: release option and deactivate UNICODE layer
+                SEND_STRING(SS_UP(X_LOPT));
+                layer_off(UNICODE);
             }
             break;
         case KC_CYCLE_INPUTS:
