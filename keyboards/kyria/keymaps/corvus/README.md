@@ -5,6 +5,8 @@
   This would allow both option-shift and command-shift adjacent bars.
 * Consider which of the home-row mods to duplicate on the right hand.
 * Consider that the SYMBOLS layer could be activated from within NUMPAD.
+* Or even split it into two layers, for symbols and for numbers,
+  and/or use layer-taps on the default layer but one row down from home.
 * Consider new placement of the backspace key, as it takes a moment
   to reposition the thumb afterward.
 * Fix the escape functionality when KC_SWITCH has been pressed.
