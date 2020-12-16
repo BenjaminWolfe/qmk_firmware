@@ -563,7 +563,16 @@ void matrix_scan_user(void) {
 }
 #endif
 
-#define HSV_BLUISH 152, 255, 255 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
+// https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
+// picked a nice blue with max saturation and luminance, rest are evenly spaced hues
+#define HSV_BLUISH 152, 255, 255
+#define HSV_COLOR1 184, 255, 255
+#define HSV_COLOR2 216, 255, 255
+#define HSV_COLOR3 248, 255, 255
+#define HSV_COLOR4  24, 255, 255
+#define HSV_COLOR5  56, 255, 255
+#define HSV_COLOR6  88, 255, 255
+#define HSV_COLOR7 120, 255, 255
 
 #ifdef RGBLIGHT_ENABLE
 // Lighting layers
@@ -592,25 +601,25 @@ const rgblight_segment_t PROGMEM color_layer_1[] = RGBLIGHT_LAYER_SEGMENTS(
     {1, 20, HSV_BLUISH}
 );
 const rgblight_segment_t PROGMEM color_layer_2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_ORANGE}
+    {1, 20, HSV_COLOR1}
 );
 const rgblight_segment_t PROGMEM color_layer_3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_GOLDENROD}
+    {1, 20, HSV_COLOR2}
 );
 const rgblight_segment_t PROGMEM color_layer_4[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_CYAN}
+    {1, 20, HSV_COLOR3}
 );
 const rgblight_segment_t PROGMEM color_layer_5[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_PURPLE}
+    {1, 20, HSV_COLOR4}
 );
 const rgblight_segment_t PROGMEM color_layer_6[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_CORAL}
+    {1, 20, HSV_COLOR5}
 );
 const rgblight_segment_t PROGMEM color_layer_7[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_MAGENTA}
+    {1, 20, HSV_COLOR6}
 );
 const rgblight_segment_t PROGMEM color_layer_8[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_PINK}
+    {1, 20, HSV_COLOR7}
 );
 
 // Now define the array of layers. Later layers take precedence
