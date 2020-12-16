@@ -55,25 +55,10 @@ void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
 uint16_t copy_paste_timer;
 static uint8_t command_tracker;
 
-// https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
-#ifdef COMBO_ENABLE
-enum combos {
-  ST_SYMBOLS,
-  NE_SYMBOLS
-};
-
-const uint16_t PROGMEM st_combo[] = {KC_S, KC_T, COMBO_END};
-const uint16_t PROGMEM ne_combo[] = {KC_N, KC_E, COMBO_END};
-
-combo_t key_combos[COMBO_COUNT] = {
-  [ST_SYMBOLS] = COMBO_ACTION(st_combo),
-  [NE_SYMBOLS] = COMBO_ACTION(ne_combo),
-};
-#endif
-
 // TODO: Make the layers match the enum.
 enum layers {
     COLEMAK = 0,
+    _SAFE,
     NUMPAD,
     UNICODE,
     CODING,
@@ -97,30 +82,58 @@ enum custom_keycodes {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* 
  * Base Layer: COLEMAK
- * Resting middle position of each thumb is spacebar; on left, hold for command key
- * Shift: tap bottom left corner for caps lock, hold for shift; tap bottom right for enter, hold for shift
- * KC_BKTK_ESCAPE: tap for backtick, hold briefly for escape
- * combo of index and middle (either hand) to use SYMBOLS layer
- * asterisked letters are those I prefer not to use in mod-tap combinations (see readme)
+ * Line 2 of each key is what you get when you hold it.
+ * Layer names are distinguished by CAPS.
+ * I try to avoid the inner thumb keys.
+ * I find it works really well to have modifiers in the home row.
+ * That said, some keys in MacOS already have tap-and-hold functionality;
+ *   for those, see the _SAFE layer.
+ * Note that because of the placement of Shift and SYMBOLS,
+ *   ideally nothing on the SYMBOLS layer should require Shift.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |  *L*  |  *U*  |  *Y*  |  ; :  |   - _   |
- * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
+ * |   Esc   | _SAFE |       |       |       |       |                                  |       |       |       |       | _SAFE |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Tab   |  *A*  |   R   |  *S*  |   T   |   D   |                                  |   H   |  *N*  |  *E*  |  *I*  |  *O*  |   ' "   |
+ * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
+ * |         |       |Control|  Opt  | Shift |SYMBOLS|                                  |SYMBOLS| Shift |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |Caps Lock|  *Z*  |   X   |  *C*  |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
- * |  Shift  |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Shift  |
+ * |Caps Lock|   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
+ * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |  NAV  | NUMPD |  |       |Backspc| Space |  Del  |       |
- *                           |Control|  Opt  |Command|       |       |  | ADJST |       |       |       |       |
+ *                           |       |       | Space |       |       |  |  Del  |Backspc| Space |       |       |
+ *                           |       |       |Command|  NAV  | NUMPD |  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,        KC_Q,    KC_W,    KC_F,    KC_P,    KC_G,                                                     KC_J,   KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
-      KC_TAB,                KC_A,    KC_R,    KC_S,    KC_T,    KC_D,                                                     KC_H,   KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      MT(MOD_LSFT, KC_CAPS), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,           _______, _______,    _______,    _______, KC_K,   KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(MOD_RSFT, KC_ENTER),
-                                               KC_LCTL, KC_LOPT, LCMD_T(KC_SPC), KC_NAV,  MO(NUMPAD), MO(ADJUST), KC_BSPC, KC_SPC, KC_DEL,  _______
+      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,               KC_F,               KC_P,               KC_G,                                                                KC_J,              KC_L,               KC_U,    KC_Y,    LT(_SAFE, KC_SCLN), KC_MINS,
+      KC_TAB,         KC_A,            MT(MOD_LCTL, KC_R), MT(MOD_LALT, KC_S), MT(MOD_LSFT, KC_T), LT(SYMBOLS, KC_D),                                                   LT(SYMBOLS, KC_H), MT(MOD_RSFT, KC_N), KC_E,    KC_I,    KC_O,               KC_QUOT,
+      KC_CAPS,        KC_Z,            KC_X,               KC_C,               KC_V,               KC_B,              _______, _______,    _______,            _______, KC_K,              KC_M,               KC_COMM, KC_DOT,  KC_SLSH,            KC_ENTER,
+                                                           _______,            _______,            LCMD_T(KC_SPC),    KC_NAV,  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC,            _______,            _______
+    ),
+/* 
+ * Safe Layer: no mod-tap keys
+ * This way you can take advantage of special MacOS tap-and-hold keys:
+ * `luy` (top row, RH), `asneio` (home row), and `zc` (bottom row, LH).
+ *
+ * ,-------------------------------------------------.                                  ,-------------------------------------------------.
+ * |         |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
+ * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
+ * |         |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
+ * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
+ * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |         |
+ * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           `---------------------------------------'  `---------------------------------------'
+ */
+    [_SAFE] = LAYOUT(
+      _______, KC_Q, KC_W, KC_F,    KC_P,    KC_G,                                        KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
+      _______, KC_A, KC_R, KC_S,    KC_T,    KC_D,                                        KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+      _______, KC_Z, KC_X, KC_C,    KC_V,    KC_B,    _______, _______, _______, _______, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, _______,
+                           _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
 /*
  * Modified Number Pad
@@ -149,6 +162,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Unicode Pad
  * intended primarily for *entering unicode hex values*
  * KC_UNICODE on the NUMPAD layer, when tapped and held, will activate this layer *and hold the option key*
+ * "Cycle inputs" to cycle through keymap inputs. You have to have enabled unicode input on your Mac.
+ * "Toggle inputs" to switch back to the one you were just on.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   |   D   |         |
@@ -224,7 +239,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * FIND_REPLACE: tap to find (command-f), double-tap to replace (command-option-f, as defined in VS Code defaults).
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         | Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
+ * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |         |       |Command|  Opt  | Shift | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
@@ -237,10 +252,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      _______, LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      _______, _______,    KC_LCMD,          KC_LOPT,       KC_LSFT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______, _______,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
-                                             _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
+      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
+      _______,        _______,    KC_LCMD,          KC_LOPT,       KC_LSFT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        _______,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
+                                                    _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
  /*
   * Chrome
@@ -494,32 +509,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-// https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
-#ifdef COMBO_ENABLE
-void process_combo_event(uint16_t combo_index, bool pressed) {
-  switch(combo_index) {
-    case ST_SYMBOLS:
-      if (pressed) {
-        // on press
-        layer_on(SYMBOLS);
-      } else {
-        // on release
-        layer_off(SYMBOLS);
-      }
-      break;
-    case NE_SYMBOLS:
-      if (pressed) {
-        // on press
-        layer_on(SYMBOLS);
-      } else {
-        // on release
-        layer_off(SYMBOLS);
-      }
-      break;
-  }
-}
-#endif
-
 #ifdef LEADER_ENABLE
 bool is_alt_tab_active = false;
 uint16_t alt_tab_timer = 0;
@@ -694,6 +683,9 @@ static void render_status(void) {
     switch (get_highest_layer(layer_state)) {
         case COLEMAK:
             oled_write_P(PSTR("Colemak\n"), false);
+            break;
+        case _SAFE:
+            oled_write_P(PSTR("Safety\n"), false);
             break;
         case NUMPAD:
             oled_write_P(PSTR("Numpad\n"), false);

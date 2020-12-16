@@ -16,10 +16,6 @@
 
 #pragma once
 
-// https://beta.docs.qmk.fm/using-qmk/software-features/feature_combo
-#define COMBO_COUNT 2
-#define COMBO_TERM 50
-
 #ifdef OLED_DRIVER_ENABLE
   #define OLED_DISPLAY_128X64
 #endif
@@ -37,14 +33,14 @@
 
 // EC11K encoders have a different resolution than other EC11 encoders.
 // When using the default resolution of 4, if you notice your encoder skipping
-// every other tick, lower the resolution to 2.
+// every other tick, lower the resolution to 2. 
 #define ENCODER_RESOLUTION 2
 
 // The Leader key allows to flexibly assign macros to key sequences.
 #define LEADER_PER_KEY_TIMING
 #define LEADER_TIMEOUT 350
 
-#define TAPPING_TERM 200
+#define TAPPING_TERM 100
 
 // Allows to use either side as the master. Look at the documentation for info:
 // https://docs.qmk.fm/#/config_options?id=setting-handedness
