@@ -1,5 +1,16 @@
 # Open Tasks and Ideas
 
+* Consider control-option-shift-command all in the home row in that order,
+  per the article linked in the comments to `config.h`.
+  This would allow both option-shift and command-shift adjacent bars.
+* Consider which of the home-row mods to duplicate on the right hand.
+* Consider that the SYMBOLS layer could be activated from within NUMPAD.
+* Consider new placement of the backspace key, as it takes a moment
+  to reposition the thumb afterward.
+* Fix the escape functionality when KC_SWITCH has been pressed.
+* Consider new placement of the caps lock key.
+* Consider using aliases for keys as outlined in the same article mentioned above.
+  It certainly makes the code easier to read.
 * Command-shift-x for 1Password?
 * Nicer use of layer colors.
 * More intentional arrangement of RGB, media, and function keys.
