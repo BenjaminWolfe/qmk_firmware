@@ -7,6 +7,8 @@
 * Consider that the SYMBOLS layer could be activated from within NUMPAD.
 * Or even split it into two layers, for symbols and for numbers,
   and/or use layer-taps on the default layer but one row down from home.
+* Or for that matter, it can be one layer, and if shift is the middle finger
+  and SYMBOL is the index one down, they can be used together quite easily.
 * Consider new placement of the backspace key, as it takes a moment
   to reposition the thumb afterward.
 * Fix the escape functionality when KC_SWITCH has been pressed.
