@@ -80,7 +80,7 @@ enum custom_keycodes {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/* 
+/*
  * Base Layer: COLEMAK
  * Line 2 of each key is what you get when you hold it.
  * Layer names are distinguished by CAPS.
@@ -111,7 +111,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_CAPS,        KC_Z,            KC_X,               KC_C,               KC_V,               KC_B,              _______, _______,    _______,            _______, KC_K,              KC_M,               KC_COMM, KC_DOT,  KC_SLSH,            KC_ENTER,
                                                            _______,            _______,            LCMD_T(KC_SPC),    KC_NAV,  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC,            _______,            _______
     ),
-/* 
+/*
  * Safe Layer: no mod-tap keys
  * This way you can take advantage of special MacOS tap-and-hold keys:
  * `luy` (top row, RH), `asneio` (home row), and `zc` (bottom row, LH).
@@ -220,7 +220,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   */
      [SYMBOLS] = LAYOUT(
        KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_PLUS,
-       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_KP_EQUAL,   
+       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_KP_EQUAL,
        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
@@ -750,7 +750,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
                     if (!is_alt_tab_active) {
                         is_alt_tab_active = true;
                         register_code(KC_LALT);
-                    } 
+                    }
                     alt_tab_timer = timer_read();
                     tap_code16(KC_TAB);
                 } else {
