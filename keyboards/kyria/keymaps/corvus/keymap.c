@@ -61,7 +61,6 @@ enum layers {
     _SAFE,
     NUMPAD,
     UNICODE,
-    CODING,
     TOP_ROW,
     NAV,
     CHROME,
@@ -146,12 +145,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * intended primarily for *entering numerical values*
  * all symbols can be found in familiar locations on the TOP_ROW layer
  * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
- * use CODING layer for easy entering of parens, brackets, curly braces, slashes, and pipe
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |       |       |       |                                  |   =   |   7   |   8   |   9   |   /   |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |UNICODE| CODNG |       |                                  |   +   |   4   |   5   |   6   |   *   |         |
+ * |         |       |       |       |UNICODE|       |                                  |   +   |   4   |   5   |   6   |   *   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |   (   |   1   |   2   |   3   |   )   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -159,10 +157,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMPAD] = LAYOUT(
-      _______, _______, _______, _______,    _______,    _______,                                             KC_KP_EQUAL, KC_KP_7,   KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
-      _______, _______, _______, KC_UNICODE, MO(CODING), _______,                                             KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
-      _______, _______, _______, _______,    _______,    _______, _______, _______, _______,     _______,     KC_LPRN,     KC_KP_1,   KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
-                                 _______,    _______,    _______, _______, _______, KC_KP_COMMA, KC_KP_MINUS, KC_KP_0,     KC_KP_DOT, _______
+      _______, _______, _______, _______, _______,    _______,                                             KC_KP_EQUAL, KC_KP_7,   KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
+      _______, _______, _______, _______, KC_UNICODE, _______,                                             KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
+      _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______,     KC_LPRN,     KC_KP_1,   KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
+                                 _______, _______,    _______, _______, _______, KC_KP_COMMA, KC_KP_MINUS, KC_KP_0,     KC_KP_DOT, _______
     ),
 /*
  * Unicode Pad
@@ -188,35 +186,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,         KC_C,    KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
                                  _______, _______, _______, _______, _______, KC_TOGGLE_INPUTS, KC_CYCLE_INPUTS, KC_KP_0, _______, _______
     ),
-/*
- * Common Coding Symbols
- *
- * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |       |   [   |   ]   |   \   |       |         |
- * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |                                  |       |   (   |   )   |   /   |       |         |
- * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |       |   {   |   }   |   |   |       |         |
- * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
- *                           |       |       |       |       |       |  |       |       |       |       |       |
- *                           `---------------------------------------'  `---------------------------------------'
- */
-    [CODING] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                     _______, KC_LBRC, KC_RBRC, KC_BSLS, _______, _______,
-      _______, _______, _______, _______, _______, _______,                                     _______, KC_LPRN, KC_RPRN, KC_PSLS, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, KC_PIPE, _______, _______,
-                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
-    ),
  /*
   * Numbers and Symbols (traditional top row)
   * Shows numbers and symbols in a modified top-row pattern, for password muscle memory and such
   * Pinky gets plus and equal sign because hyphen/underscore are already on the default layer.
+  * Brackets, curly braces, backslashes and pipes are added bc they deserve easy access!
+  *   Right hand, home row.
+  *   Though it might seem intuitive to give brackets to the strongest fingers,
+  *     it feels more natural the way I have it.
   *
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |   ` ~   |  1 !  |  2 @  |  3 #  |  4 $  |  5 %  |                                  |  6 ^  |  7 &  |  8 *  |  9 (  |  0 )  |   = +   |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+  * |         |       |       |       |       |       |                                  |       |  / |  |  [ {  |  ] }  |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -226,7 +208,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   */
      [TOP_ROW] = LAYOUT(
        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
-       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
+       _______, _______, _______, _______, _______, _______,                                     _______, KC_BSLS, KC_LBRC, KC_RBRC, _______, _______,
        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
@@ -504,11 +486,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 layer_state_t layer_state_set_kb(layer_state_t state) {
     switch (get_highest_layer(state)) {
-        // clear command after returning from NAV layer
-        // I foresee no adverse side effects coding it this broadly
+        // clear command after returning from NAV layer after KC_SWITCH
         case COLEMAK:
-            clear_mods();
-            command_tracker = 0; // for KC_SWITCH
+            if (command_tracker) {
+                unregister_code(KC_LCMD);
+                command_tracker = 0;
+            }
             break;
         }
     return state;
@@ -697,9 +680,6 @@ static void render_status(void) {
             break;
         case UNICODE:
             oled_write_P(PSTR("Unicode\n"), false);
-            break;
-        case CODING:
-            oled_write_P(PSTR("Coding\n"), false);
             break;
         case TOP_ROW:
             oled_write_P(PSTR("Top Row\n"), false);
