@@ -75,7 +75,6 @@ enum custom_keycodes {
     KC_UNICODE,
     KC_CYCLE_INPUTS,
     KC_TOGGLE_INPUTS,
-    KC_NAV,
     KC_SWITCH
 };
 
@@ -88,33 +87,35 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * I find it works really well to have modifiers in the home row.
  * That said, some keys in MacOS already have tap-and-hold functionality;
  *   for those, see the _SAFE layer.
- * Furthermore, since the left hand is home to a lot of command-shortcuts
- *   that are worth being able to do with one hand while holding a mouse,
- *   command has been moved to the thumb.
+ * Also note that since the left hand is home to a lot of command-shortcuts
+ *   that I like to do with one hand while holding a mouse,
+ *   I've moved command to the thumb.
  * The control-option-shift-toprow order allows easy access to a shifted top row,
  *   and it also works well with the NAV layer.
- *   There, control-option-shift-command allows easy combos
- *   of either command-shift or option-shift, for editing.
+ *   In the NAV layer, control-option-shift-command allows easy combos
+ *   of either command-shift or option-shift for editing.
+ * Keyboarding hot take: caps lock very much deserves a place in the home row, for me.
+ *   I use it in a disciplined way pretty much any time I have multiple caps in a row.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   | _SAFE |       |       |       |       |                                  |       |       |       |       | _SAFE |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
+ * |Caps Lock|   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
  * |         |Control|  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |Control|         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |Caps Lock|   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
+ * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |       |       |  |  Del  |Backspc| Space |       |       |
+ *                           |       |       | Space |  Tab  |       |  |  Del  |Backspc| Space |       |       |
  *                           |       |       |Command|  NAV  | NUMPD |  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                             KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
-      KC_TAB,         LCTL_T(KC_A),    LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                             KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), RCTL_T(KC_O),       KC_QUOT,
-      KC_CAPS,        KC_Z,            KC_X,         KC_C,         KC_V,              KC_B,           _______, _______,    _______,            _______, KC_K,   KC_M,              KC_COMM,      KC_DOT,       KC_SLSH,            KC_ENTER,
-                                                     _______,      _______,           LCMD_T(KC_SPC), KC_NAV,  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC, _______,           _______
+      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                                      KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
+      KC_CAPS,        LCTL_T(KC_A),    LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                                      KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), RCTL_T(KC_O),       KC_QUOT,
+      _______,        KC_Z,            KC_X,         KC_C,         KC_V,              KC_B,           _______,          _______,    _______,            _______, KC_K,   KC_M,              KC_COMM,      KC_DOT,       KC_SLSH,            KC_ENTER,
+                                                     _______,      _______,           LCMD_T(KC_SPC), LT(NAV, KC_TAB),  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC, _______,           _______
     ),
 /*
  * Safe Layer: no mod-tap keys
@@ -237,7 +238,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * KC_SWITCH is for switching tabs on a Mac.
  *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
  *     Any other time it will just press tab.
- *     Command will be released when dropping out of the layer.
+ *     Command will be released when dropping out of the layer
+ *     (see layer_state_set_kb below).
  * use CHROME and VSCODE layers to navigate between tabs
  * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
  * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
@@ -484,20 +486,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // on release: nothing
             }
             break;
-        case KC_NAV:
-            if (record->event.pressed) {
-                // on press: turn NAV layer on
-                layer_on(NAV);
-            } else {
-                // on release: turn NAV layer off, *and release command if needed*,
-                // in case KC_SWITCH depressed it for window-switching (see below)
-                if (command_tracker) {
-                    unregister_code(KC_LCMD);
-                    command_tracker--;
-                }
-                layer_off(NAV);
-            }
-            break;
         case KC_SWITCH:
             if (record->event.pressed) {
                 // on press: depress command if not already depressed; tap tab
@@ -512,6 +500,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
     }
     return true;
+}
+
+layer_state_t layer_state_set_kb(layer_state_t state) {
+    switch (get_highest_layer(state)) {
+        // clear command after returning from NAV layer
+        // I foresee no adverse side effects coding it this broadly
+        case COLEMAK:
+            clear_mods();
+            command_tracker = 0; // for KC_SWITCH
+            break;
+        }
+    return state;
 }
 
 #ifdef LEADER_ENABLE
@@ -557,6 +557,7 @@ void matrix_scan_user(void) {
 }
 #endif
 
+#ifdef RGBLIGHT_ENABLE
 // https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
 // picked a nice blue with max saturation and luminance, rest are evenly spaced hues
 #define HSV_BLUISH 152, 255, 255
@@ -568,7 +569,6 @@ void matrix_scan_user(void) {
 #define HSV_COLOR6  88, 255, 255
 #define HSV_COLOR7 120, 255, 255
 
-#ifdef RGBLIGHT_ENABLE
 // Lighting layers
 // https://docs.qmk.fm/#/feature_rgblight?id=lighting-layers
 /* Popular colors to try:
