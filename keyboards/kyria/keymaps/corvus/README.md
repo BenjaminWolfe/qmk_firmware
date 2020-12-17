@@ -2,7 +2,6 @@
 
 * Consider new placement of the backspace key, as it takes a moment
   to reposition the thumb afterward.
-* Fix the escape functionality when KC_SWITCH has been pressed.
 * Consider new placement of the caps lock key.
 * Consider using aliases for keys as outlined in the same article mentioned above.
   It certainly makes the code easier to read.
