@@ -62,7 +62,7 @@ enum layers {
     NUMPAD,
     UNICODE,
     CODING,
-    SYMBOLS,
+    TOP_ROW,
     NAV,
     CHROME,
     VSCODE,
@@ -88,15 +88,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * I find it works really well to have modifiers in the home row.
  * That said, some keys in MacOS already have tap-and-hold functionality;
  *   for those, see the _SAFE layer.
- * Note that because of the placement of Shift and SYMBOLS,
- *   ideally nothing on the SYMBOLS layer should require Shift.
+ * Furthermore, since the left hand is home to a lot of command-shortcuts
+ *   that are worth being able to do with one hand while holding a mouse,
+ *   command has been moved to the thumb.
+ * The control-option-shift-toprow order allows easy access to a shifted top row,
+ *   and it also works well with the NAV layer.
+ *   There, control-option-shift-command allows easy combos
+ *   of either command-shift or option-shift, for editing.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   | _SAFE |       |       |       |       |                                  |       |       |       |       | _SAFE |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |   Tab   |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
- * |         |       |Control|  Opt  | Shift |SYMBOLS|                                  |SYMBOLS| Shift |       |       |       |         |
+ * |         |Control|  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |Control|         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
@@ -106,10 +111,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,               KC_F,               KC_P,               KC_G,                                                                KC_J,              KC_L,               KC_U,    KC_Y,    LT(_SAFE, KC_SCLN), KC_MINS,
-      KC_TAB,         KC_A,            MT(MOD_LCTL, KC_R), MT(MOD_LALT, KC_S), MT(MOD_LSFT, KC_T), LT(SYMBOLS, KC_D),                                                   LT(SYMBOLS, KC_H), MT(MOD_RSFT, KC_N), KC_E,    KC_I,    KC_O,               KC_QUOT,
-      KC_CAPS,        KC_Z,            KC_X,               KC_C,               KC_V,               KC_B,              _______, _______,    _______,            _______, KC_K,              KC_M,               KC_COMM, KC_DOT,  KC_SLSH,            KC_ENTER,
-                                                           _______,            _______,            LCMD_T(KC_SPC),    KC_NAV,  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC,            _______,            _______
+      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                             KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
+      KC_TAB,         LCTL_T(KC_A),    LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                             KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), RCTL_T(KC_O),       KC_QUOT,
+      KC_CAPS,        KC_Z,            KC_X,         KC_C,         KC_V,              KC_B,           _______, _______,    _______,            _______, KC_K,   KC_M,              KC_COMM,      KC_DOT,       KC_SLSH,            KC_ENTER,
+                                                     _______,      _______,           LCMD_T(KC_SPC), KC_NAV,  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC, _______,           _______
     ),
 /*
  * Safe Layer: no mod-tap keys
@@ -138,7 +143,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Modified Number Pad
  * intended primarily for *entering numerical values*
- * all symbols can be found in familiar locations on the SYMBOLS layer
+ * all symbols can be found in familiar locations on the TOP_ROW layer
  * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
  * use CODING layer for easy entering of parens, brackets, curly braces, slashes, and pipe
  *
@@ -203,14 +208,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
-  * Numbers and Symbols
+  * Numbers and Symbols (traditional top row)
   * Shows numbers and symbols in a modified top-row pattern, for password muscle memory and such
   * Pinky gets plus and equal sign because hyphen/underscore are already on the default layer.
   *
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
-  * |    ~    |   !   |   @   |   #   |   $   |   %   |                                  |   ^   |   &   |   *   |   (   |   )   |    +    |
+  * |   ` ~   |  1 !  |  2 @  |  3 #  |  4 $  |  5 %  |                                  |  6 ^  |  7 &  |  8 *  |  9 (  |  0 )  |   = +   |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |    `    |   1   |   2   |   3   |   4   |   5   |                                  |   6   |   7   |   8   |   9   |   0   |    =    |
+  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -218,9 +223,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   *                           |       |       |       |       |       |  |       |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
-     [SYMBOLS] = LAYOUT(
-       KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_PLUS,
-       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_KP_EQUAL,
+     [TOP_ROW] = LAYOUT(
+       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
+       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
@@ -241,7 +246,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |Command|  Opt  | Shift | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |         |Control|  Opt  | Shift |Command| Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
  * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
@@ -253,7 +258,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NAV] = LAYOUT(
       LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      _______,        _______,    KC_LCMD,          KC_LOPT,       KC_LSFT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        KC_LCTL,    KC_LOPT,          KC_LSFT,       KC_LCMD,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
       _______,        _______,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
                                                     _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
@@ -696,8 +701,8 @@ static void render_status(void) {
         case CODING:
             oled_write_P(PSTR("Coding\n"), false);
             break;
-        case SYMBOLS:
-            oled_write_P(PSTR("Symbols\n"), false);
+        case TOP_ROW:
+            oled_write_P(PSTR("Top Row\n"), false);
             break;
         case NAV:
             oled_write_P(PSTR("Navigation\n"), false);

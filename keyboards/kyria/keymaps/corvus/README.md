@@ -1,14 +1,5 @@
 # Open Tasks and Ideas
 
-* Consider control-option-shift-command all in the home row in that order,
-  per the article linked in the comments to `config.h`.
-  This would allow both option-shift and command-shift adjacent bars.
-* Consider which of the home-row mods to duplicate on the right hand.
-* Consider that the SYMBOLS layer could be activated from within NUMPAD.
-* Or even split it into two layers, for symbols and for numbers,
-  and/or use layer-taps on the default layer but one row down from home.
-* Or for that matter, it can be one layer, and if shift is the middle finger
-  and SYMBOL is the index one down, they can be used together quite easily.
 * Consider new placement of the backspace key, as it takes a moment
   to reposition the thumb afterward.
 * Fix the escape functionality when KC_SWITCH has been pressed.
