@@ -93,6 +93,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *   and it also works well with the NAV layer.
  *   In the NAV layer, control-option-shift-command allows easy combos
  *   of either command-shift or option-shift for editing.
+ * I'm also experimenting with doubling shift and toprow up in the top row,
+ *   but reversed, for the sake of strings like passwords
+ *   that combine letters, numbers, and symbols liberally.
+ *   It's no fun to use the same finger (and key!)
+ *   for a modifier and a character in quick succession.
  * Keyboarding hot take: caps lock very much deserves a place in the home row, for me.
  *   I use it in a disciplined way pretty much any time I have multiple caps in a row.
  * Control, on the other hand, does not (not on MacOS).
@@ -101,7 +106,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
- * |   Esc   | _SAFE |       |       |       |       |                                  |       |       |       |       | _SAFE |         |
+ * |   Esc   | _SAFE |       |TOP_ROW| Shift |       |                                  |       | Shift |TOP_ROW|       | _SAFE |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
  * |         |       |  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |       |         |
@@ -109,15 +114,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |Backspc| Space |  Tab  |  |       |  Del  | Space |       |       |
+ *                           |       |Backspc|Backspc| Space |  Tab  |  |  Del  |Backspc| Space |       |       |
  *                           |       |       |Command|  NAV  | NUMPD |  |       | ADJST |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                                                 KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
-      KC_CAPS,        KC_A,            LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                                                 KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), KC_O,               KC_QUOT,
-      _______,        LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,            _______,            _______,            _______, _______,            KC_K,   KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH),    KC_ENTER,
-                                                     _______,      _______,           LCMD_T(KC_BSPC), LT(NAV, KC_SPACE),  LT(NUMPAD, KC_TAB), _______, LT(ADJUST, KC_DEL), KC_SPC, _______,           _______
+      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         LT(TOP_ROW, KC_F), LSFT_T(KC_P),      KC_G,                                                                                  KC_J,   RSFT_T(KC_L),      LT(TOP_ROW, KC_U), KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
+      KC_CAPS,        KC_A,            LOPT_T(KC_R), LSFT_T(KC_S),      LT(TOP_ROW, KC_T), KC_D,                                                                                  KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E),      ROPT_T(KC_I), KC_O,               KC_QUOT,
+      _______,        LCTL_T(KC_Z),    KC_X,         KC_C,              KC_V,              KC_B,            _______,            _______,            _______, _______,             KC_K,   KC_M,              KC_COMM,           KC_DOT,       RCTL_T(KC_SLSH),    KC_ENTER,
+                                                     _______,           KC_BSPC,           LCMD_T(KC_BSPC), LT(NAV, KC_SPACE),  LT(NUMPAD, KC_TAB), KC_DEL,  LT(ADJUST, KC_BSPC), KC_SPC, _______,           _______
     ),
 /*
  * Safe Layer: no mod-tap keys

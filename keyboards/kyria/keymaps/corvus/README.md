@@ -11,6 +11,9 @@
   too much confusion, accidentally backspacing when I meant to space.
   I do use left-space when my right hand is on the mouse,
   and for that reason I've added it one thumb position out.
+* For the moment I'm keeping backspace where it used to be as well,
+  since I'm used to it.
+  And doubled up backspace on the left because I sometimes miss the key.
 * Consider using aliases for keys as outlined in the same article mentioned above.
   It certainly makes the code easier to read.
 * Command-shift-x for 1Password?
