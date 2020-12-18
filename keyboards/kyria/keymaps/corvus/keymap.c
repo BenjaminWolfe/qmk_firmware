@@ -95,26 +95,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *   of either command-shift or option-shift for editing.
  * Keyboarding hot take: caps lock very much deserves a place in the home row, for me.
  *   I use it in a disciplined way pretty much any time I have multiple caps in a row.
+ * Control, on the other hand, does not (not on MacOS).
+ *   To help mitigate rollover issues (e.g. control-t is a problem when typing "that"),
+ *   I've moved it one row down. Z and slash are hardly ever used in a rollover!
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   | _SAFE |       |       |       |       |                                  |       |       |       |       | _SAFE |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
- * |         |Control|  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |Control|         |
+ * |         |       |  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
- * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |  Tab  |       |  |  Del  |Backspc| Space |       |       |
- *                           |       |       |Command|  NAV  | NUMPD |  | ADJST |       |       |       |       |
+ *                           |       |       |Backspc| Space |  Tab  |  |       |  Del  | Space |       |       |
+ *                           |       |       |Command|  NAV  | NUMPD |  |       | ADJST |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                                      KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
-      KC_CAPS,        LCTL_T(KC_A),    LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                                      KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), RCTL_T(KC_O),       KC_QUOT,
-      _______,        KC_Z,            KC_X,         KC_C,         KC_V,              KC_B,           _______,          _______,    _______,            _______, KC_K,   KC_M,              KC_COMM,      KC_DOT,       KC_SLSH,            KC_ENTER,
-                                                     _______,      _______,           LCMD_T(KC_SPC), LT(NAV, KC_TAB),  MO(NUMPAD), LT(ADJUST, KC_DEL), KC_BSPC, KC_SPC, _______,           _______
+      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         KC_F,         KC_P,              KC_G,                                                                                 KC_J,   KC_L,              KC_U,         KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
+      KC_CAPS,        KC_A,            LOPT_T(KC_R), LSFT_T(KC_S), LT(TOP_ROW, KC_T), KC_D,                                                                                 KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), KC_O,               KC_QUOT,
+      _______,        LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,            _______,            _______,            _______, _______,            KC_K,   KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH),    KC_ENTER,
+                                                     _______,      _______,           LCMD_T(KC_BSPC), LT(NAV, KC_SPACE),  LT(NUMPAD, KC_TAB), _______, LT(ADJUST, KC_DEL), KC_SPC, _______,           _______
     ),
 /*
  * Safe Layer: no mod-tap keys
@@ -145,11 +148,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * intended primarily for *entering numerical values*
  * all symbols can be found in familiar locations on the TOP_ROW layer
  * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
+ * Added a dedicated tab here.
+ *   It's common to tab after numbers, for example when autocompleting git branch names.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |       |       |       |                                  |   =   |   7   |   8   |   9   |   /   |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |UNICODE|       |                                  |   +   |   4   |   5   |   6   |   *   |         |
+ * |         |       |       |       |UNICODE|  Tab  |                                  |   +   |   4   |   5   |   6   |   *   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |   (   |   1   |   2   |   3   |   )   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -158,7 +163,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NUMPAD] = LAYOUT(
       _______, _______, _______, _______, _______,    _______,                                             KC_KP_EQUAL, KC_KP_7,   KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
-      _______, _______, _______, _______, KC_UNICODE, _______,                                             KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
+      _______, _______, _______, _______, KC_UNICODE, KC_TAB,                                              KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
       _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______,     KC_LPRN,     KC_KP_1,   KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
                                  _______, _______,    _______, _______, _______, KC_KP_COMMA, KC_KP_MINUS, KC_KP_0,     KC_KP_DOT, _______
     ),
@@ -230,10 +235,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Esc   |Control|  Opt  | Shift |Command| Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |   Esc   |       |  Opt  | Shift |Command| Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
- * |         |       | Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
+ * |         |Control| Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
  * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |   ←   |       |   →   |       |
@@ -242,8 +247,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NAV] = LAYOUT(
       LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         KC_LCTL,    KC_LOPT,          KC_LSFT,       KC_LCMD,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______,        _______,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
+      KC_ESC,         _______,    KC_LOPT,          KC_LSFT,       KC_LCMD,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        KC_LCTL,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
                                                     _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
     ),
  /*

@@ -1,7 +1,16 @@
 # Open Tasks and Ideas
 
-* Consider new placement of the backspace key, as it takes a moment
-  to reposition the thumb afterward.
+* Consider moving _all_ modifiers from home row down one row.
+  Perfect for Colemak, since the home row is so packed with rollover keys?
+  Could also just be too far out of the way to do that across the board.
+* Trying a new placement for backspace;
+  I realize I don't really use space with my left thumb,
+  and the previous backspace placement, left of the right-hand space key,
+  wasn't working out.
+  Too much thumb movement, too much finding the right spot after moving it,
+  too much confusion, accidentally backspacing when I meant to space.
+  I do use left-space when my right hand is on the mouse,
+  and for that reason I've added it one thumb position out.
 * Consider using aliases for keys as outlined in the same article mentioned above.
   It certainly makes the code easier to read.
 * Command-shift-x for 1Password?
