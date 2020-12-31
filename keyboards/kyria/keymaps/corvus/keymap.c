@@ -1,4 +1,4 @@
-/* Copyright 2019 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
+/* Copyright 2020 Benjamin Wolfe <benjamin.e.wolfe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,11 @@ void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
 void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
 
 uint16_t copy_paste_timer;
-static uint8_t command_tracker;
+bool command_tracker = false;
+
+uint16_t diacritical_mark_timer = 0;
+bool need_diacritical = false;
+bool turn_off_symbols = false;
 
 // TODO: Make the layers match the enum.
 enum layers {
@@ -85,30 +89,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK
  * Line 2 of each key is what you get when you hold it.
  * Layer names are distinguished by CAPS.
- * I try to avoid the inner thumb keys.
- * I find it works really well to have modifiers in the home row.
- * That said, some keys in MacOS already have tap-and-hold functionality;
- *   for those, see the _SAFE layer.
- * Also note that since the left hand is home to a lot of command-shortcuts
- *   that I like to do with one hand while holding a mouse,
- *   I've moved command to the thumb.
- *   (Technically with command on the index finger,
- *   the only difficult combos would be command P, T, V, G, D, or B.
- *   This just seems more elegant.)
- * The control-option-shift-toprow order allows easy access to a shifted top row,
+ * The control-option-shift-symbols order allows easy access to a shifted top row,
  *   and it also works well with the NAV layer.
  *   In the NAV layer, control-option-shift-command allows easy combos
  *   of either command-shift or option-shift for editing.
- * Keyboarding hot take: caps lock very much deserves a place in the home row, for me.
- *   I use it in a disciplined way pretty much any time I have multiple caps in a row.
- * Control, on the other hand, does not (not on MacOS).
- *   To help mitigate rollover issues (e.g. control-t is a problem when typing "that"),
- *   I've moved it one row down. Z and slash are hardly ever used in a rollover!
- * Most layers are implemented as momentary modifiers,
- *   only active while a key is pressed.
- *   To toggle a layer, hold down caps lock and press the usual key for that letter.
- *   (Holding caps lock activates the _SWITCH layer, which has layer toggle keys.)
- *   For convenience I've added the same functionality on the right side.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
@@ -120,15 +104,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |Backspc|  Tab  |       |  |       |  Del  | Space |       |       |
- *                           |       |       |Command|  NAV  | NUMPD |  |       | ADJST |       |       |       |
+ *                           |       |       |       |Backspc|  Tab  |  |  Del  | Space |       |       |       |
+ *                           |       |       | NUMPD |Command|  NAV  |  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
       KC_BKTK_ESCAPE,       KC_Q,            KC_W,         KC_F,         KC_P,              KC_G,                                                                       KC_J,    KC_L,              KC_U,         KC_Y,         KC_SCLN,         KC_MINS,
       LT(_SWITCH, KC_CAPS), LT(_SAFE, KC_A), LOPT_T(KC_R), LSFT_T(KC_S), LT(SYMBOLS, KC_T), KC_D,                                                                       KC_H,    LT(SYMBOLS, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), LT(_SAFE, KC_O), LT(_SWITCH, KC_QUOT),
-      _______,              LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,            _______,          _______,    _______, _______,            KC_K,    KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH), KC_ENTER,
-                                                           _______,      _______,           LCMD_T(KC_BSPC), LT(NAV, KC_TAB),  MO(NUMPAD), _______, LT(ADJUST, KC_DEL), KC_SPC,  _______,           _______
+      _______,              LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,       _______,         _______,          _______,            _______, KC_K,    KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH), KC_ENTER,
+                                                           _______,      _______,           MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_TAB),  LT(ADJUST, KC_DEL), KC_SPC,  _______, _______,           _______
     ),
 /*
  * SWITCH
@@ -140,15 +124,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |  NAV  | NUMPD |  |       | ADJST |       |       |       |
+ *                           |       |       | NUMPD |       |  NAV  |  | ADJST |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [_SWITCH] = LAYOUT(
       _______, _______, _______, _______, _______,     _______,                                           _______, _______,     _______, _______, _______, _______,
       _______, _______, _______, _______, TG(SYMBOLS), _______,                                           _______, TG(SYMBOLS), _______, _______, _______, _______,
-      _______, _______, _______, _______, _______,     _______, _______, _______,    _______, _______,    _______, _______,     _______, _______, _______, _______,
-                                 _______, _______,     _______, TG(NAV), TG(NUMPAD), _______, TG(ADJUST), _______, _______,     _______
+      _______, _______, _______, _______, _______,     _______,    _______, _______, _______,    _______, _______, _______,     _______, _______, _______, _______,
+                                 _______, _______,     TG(NUMPAD), _______, TG(NAV), TG(ADJUST), _______, _______, _______,     _______
     ),
 /*
  * Safe Layer: no mod-tap keys
@@ -164,7 +148,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |         |
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |Backspc|       |       |  |       |       |       |       |       |
+ *                           |       |       |       |Backspc|  Tab  |  |  Del  |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -172,7 +156,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, KC_Q, KC_W, KC_F,    KC_P,    KC_G,                                        KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
       _______, KC_A, KC_R, KC_S,    KC_T,    KC_D,                                        KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
       _______, KC_Z, KC_X, KC_C,    KC_V,    KC_B,    _______, _______, _______, _______, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, _______,
-                           _______, _______, KC_BSPC, _______, _______, _______, _______, _______, _______, _______
+                           _______, _______, _______, KC_BSPC, KC_TAB,  KC_DEL,  _______, _______, _______, _______
     ),
 /*
  * Modified Number Pad
@@ -189,14 +173,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |   (   |   1   |   2   |   3   |   )   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |   ,   |   -   |   0   |   .   |       |
+ *                           |       |       |       |       |       |  |   -   |   0   |   .   |   ,   |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMPAD] = LAYOUT(
-      _______, _______, _______, _______, _______,    _______,                                             KC_KP_EQUAL, KC_KP_7,   KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
-      _______, _______, _______, _______, KC_UNICODE, KC_TAB,                                              KC_KP_PLUS,  KC_KP_4,   KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
-      _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______,     KC_LPRN,     KC_KP_1,   KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
-                                 _______, _______,    _______, _______, _______, KC_KP_COMMA, KC_KP_MINUS, KC_KP_0,     KC_KP_DOT, _______
+      _______, _______, _______, _______, _______,    _______,                                         KC_KP_EQUAL, KC_KP_7,     KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
+      _______, _______, _______, _______, KC_UNICODE, KC_TAB,                                          KC_KP_PLUS,  KC_KP_4,     KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
+      _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______, KC_LPRN,     KC_KP_1,     KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
+                                 _______, _______,    _______, _______, _______, KC_KP_MINUS, KC_KP_0, KC_KP_DOT,   KC_KP_COMMA, _______
     ),
 /*
  * Unicode Pad
@@ -212,15 +196,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   |   F   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  | Toggl | Cycle |   0   |       |       |
- *                           |       |       |       |       |       |  | Inpts | Inpts |       |       |       |
+ *                           |       |       |       |       |       |  | Cycle |   0   | Toggl |       |       |
+ *                           |       |       |       |       |       |  | Inpts |       | Inpts |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [UNICODE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                                      KC_A,    KC_KP_7, KC_KP_8, KC_KP_9, KC_D, _______,
-      _______, _______, _______, _______, _______, _______,                                                      KC_B,    KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,         KC_C,    KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
-                                 _______, _______, _______, _______, _______, KC_TOGGLE_INPUTS, KC_CYCLE_INPUTS, KC_KP_0, _______, _______
+      _______, _______, _______, _______, _______, _______,                                             KC_A,             KC_KP_7, KC_KP_8, KC_KP_9, KC_D, _______,
+      _______, _______, _______, _______, _______, _______,                                             KC_B,             KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______,         _______, KC_C,             KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
+                                 _______, _______, _______, _______, _______, KC_CYCLE_INPUTS, KC_KP_0, KC_TOGGLE_INPUTS, _______, _______
     ),
  /*
   * Numbers and Symbols (traditional top row)
@@ -242,15 +226,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |  \ |  |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       | Space |  Del  |       |  |       |  Tab  |Backspc|       |       |
-  *                           |       |       |       |       |       |  |       |       |       |       |       |
+  *                           |       |       |       | Space |  Del  |  |  Tab  |Backspc|       |       |       |
+  *                           |       |       |       |Command|  NAV  |  | ADJST |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [SYMBOLS] = LAYOUT(
        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                                                  KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
        _______, _______, _______, _______, _______, _______,                                                               _______, _______, _______, KC_LBRC, KC_RBRC, _______,
-       _______, _______, _______, _______, _______, _______,        _______,         _______, _______, _______,            _______, _______, _______, _______, KC_BSLS, _______,
-                                  _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_DEL), _______, _______, LT(ADJUST, KC_TAB), KC_BSPC, _______, _______
+       _______, _______, _______, _______, _______, _______, _______,        _______,         _______,            _______, _______, _______, _______, _______, KC_BSLS, _______,
+                                  _______, _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_DEL), LT(ADJUST, KC_TAB), KC_BSPC, _______, _______, _______
      ),
 /*
  * Navigation Layer
@@ -291,7 +275,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |  Nxt  |       |  Lst  |       |         |
+  * |         |       |       |       |       |       |                                  |       |  Prv  |       |  Nxt  |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -311,7 +295,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |  Nxt  |       |  Lst  |       |         |
+  * |         |       |       |       |       |       |                                  |       |  Prv  |       |  Nxt  |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -465,62 +449,100 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case KC_BKTK_ESCAPE:  // One key backtick/escape
+    if (
+        (IS_LAYER_ON(_SAFE)) &&
+        (
+            (keycode == KC_L) ||
+            (keycode == KC_U) ||
+            (keycode == KC_Y) ||
+            (keycode == KC_A) ||
+            (keycode == KC_S) ||
+            (keycode == KC_N) ||
+            (keycode == KC_E) ||
+            (keycode == KC_I) ||
+            (keycode == KC_O) ||
+            (keycode == KC_Z) ||
+            (keycode == KC_C)
+        )) {
             if (record->event.pressed) {
-                copy_paste_timer = timer_read();
+                diacritical_mark_timer = timer_read();
+                need_diacritical = true;
             } else {
-                if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, escape
-                    tap_code16(KC_ESCAPE);
-                } else { // Tap, backtick
-                    tap_code16(KC_GRAVE);
+                if (turn_off_symbols) {
+                    turn_off_symbols = false;
+                    layer_off(SYMBOLS);
+                } else {
+                    need_diacritical = false;
                 }
             }
-            break;
-        case KC_UNICODE:
-            if (record->event.pressed) {
-                // on press: switch to UNICODE layer, depress option and leave it down
-                layer_on(UNICODE);
-                SEND_STRING(SS_DOWN(X_LOPT));
-            } else {
-                // on release: release option and deactivate UNICODE layer
-                SEND_STRING(SS_UP(X_LOPT));
-                layer_off(UNICODE);
+        } else {
+            switch (keycode) {
+                case KC_BKTK_ESCAPE:  // One key backtick/escape
+                    if (record->event.pressed) {
+                        copy_paste_timer = timer_read();
+                    } else {
+                        if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, escape
+                            tap_code16(KC_ESCAPE);
+                        } else { // Tap, backtick
+                            tap_code16(KC_GRAVE);
+                        }
+                    }
+                    break;
+                case KC_UNICODE:
+                    if (record->event.pressed) {
+                        // on press: switch to UNICODE layer, depress option and leave it down
+                        layer_on(UNICODE);
+                        SEND_STRING(SS_DOWN(X_LOPT));
+                    } else {
+                        // on release: release option and deactivate UNICODE layer
+                        SEND_STRING(SS_UP(X_LOPT));
+                        layer_off(UNICODE);
+                    }
+                    break;
+                case KC_CYCLE_INPUTS:
+                    if (record->event.pressed) {
+                        // on press: control-option-space
+                        // only accessed from UNICODE layer, where option is already depressed
+                        // then option key up and down to reset for unicode keystrokes
+                        SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
+                    } else {
+                        // on release: nothing
+                    }
+                    break;
+                case KC_TOGGLE_INPUTS:
+                    if (record->event.pressed) {
+                        // on press: control-space
+                        // only accessed from UNICODE layer, where option is already depressed
+                        SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
+                    } else {
+                        // on release: nothing
+                    }
+                    break;
+                case KC_SWITCH:
+                    if (record->event.pressed) {
+                        // on press: depress command if not already depressed; tap tab
+                        if (!command_tracker) {
+                            register_code(KC_LCMD);
+                            command_tracker = true;
+                        }
+                        tap_code(KC_TAB);
+                    } else {
+                        // on release: nothing
+                    }
+                    break;
             }
-            break;
-        case KC_CYCLE_INPUTS:
-            if (record->event.pressed) {
-                // on press: control-option-space
-                // only accessed from UNICODE layer, where option is already depressed
-                // then option key up and down to reset for unicode keystrokes
-                SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
-            } else {
-                // on release: nothing
-            }
-            break;
-        case KC_TOGGLE_INPUTS:
-            if (record->event.pressed) {
-                // on press: control-space
-                // only accessed from UNICODE layer, where option is already depressed
-                SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
-            } else {
-                // on release: nothing
-            }
-            break;
-        case KC_SWITCH:
-            if (record->event.pressed) {
-                // on press: depress command if not already depressed; tap tab
-                if (!command_tracker) {
-                    register_code(KC_LCMD);
-                    command_tracker++;
-                }
-                tap_code(KC_TAB);
-            } else {
-                // on release: nothing
-            }
-            break;
-    }
+        }
     return true;
+}
+
+void matrix_scan_user(void) {
+    if (need_diacritical) {
+        if (timer_elapsed(diacritical_mark_timer) > 1000) {
+            layer_on(SYMBOLS);
+            need_diacritical = false;
+            turn_off_symbols = true;
+        }
+    }
 }
 
 layer_state_t layer_state_set_kb(layer_state_t state) {
@@ -529,7 +551,7 @@ layer_state_t layer_state_set_kb(layer_state_t state) {
         case COLEMAK:
             if (command_tracker) {
                 unregister_code(KC_LCMD);
-                command_tracker = 0;
+                command_tracker = false;
             }
             break;
         }
