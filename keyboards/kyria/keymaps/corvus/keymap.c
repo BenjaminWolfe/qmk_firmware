@@ -58,10 +58,11 @@ static uint8_t command_tracker;
 // TODO: Make the layers match the enum.
 enum layers {
     COLEMAK = 0,
+    _SWITCH,
     _SAFE,
     NUMPAD,
     UNICODE,
-    TOP_ROW,
+    SYMBOLS,
     NAV,
     CHROME,
     VSCODE,
@@ -77,6 +78,8 @@ enum custom_keycodes {
     KC_SWITCH
 };
 
+// to add layers, add them here, but also check `enum layers` above
+// and `layer_state_set_user` and `render_status` below
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: COLEMAK
@@ -89,40 +92,63 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Also note that since the left hand is home to a lot of command-shortcuts
  *   that I like to do with one hand while holding a mouse,
  *   I've moved command to the thumb.
+ *   (Technically with command on the index finger,
+ *   the only difficult combos would be command P, T, V, G, D, or B.
+ *   This just seems more elegant.)
  * The control-option-shift-toprow order allows easy access to a shifted top row,
  *   and it also works well with the NAV layer.
  *   In the NAV layer, control-option-shift-command allows easy combos
  *   of either command-shift or option-shift for editing.
- * I'm also experimenting with doubling shift and toprow up in the top row,
- *   but reversed, for the sake of strings like passwords
- *   that combine letters, numbers, and symbols liberally.
- *   It's no fun to use the same finger (and key!)
- *   for a modifier and a character in quick succession.
  * Keyboarding hot take: caps lock very much deserves a place in the home row, for me.
  *   I use it in a disciplined way pretty much any time I have multiple caps in a row.
  * Control, on the other hand, does not (not on MacOS).
  *   To help mitigate rollover issues (e.g. control-t is a problem when typing "that"),
  *   I've moved it one row down. Z and slash are hardly ever used in a rollover!
+ * Most layers are implemented as momentary modifiers,
+ *   only active while a key is pressed.
+ *   To toggle a layer, hold down caps lock and press the usual key for that letter.
+ *   (Holding caps lock activates the _SWITCH layer, which has layer toggle keys.)
+ *   For convenience I've added the same functionality on the right side.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
- * |   Esc   | _SAFE |       |TOP_ROW| Shift |       |                                  |       | Shift |TOP_ROW|       | _SAFE |         |
+ * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
- * |         |       |  Opt  | Shift |TOP_ROW|       |                                  |       |TOP_ROW| Shift |  Opt  |       |         |
+ * | _SWITCH | _SAFE |  Opt  | Shift |SYMBOLS|       |                                  |       |SYMBOLS| Shift |  Opt  | _SAFE | _SWITCH |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |Backspc|Backspc| Space |  Tab  |  |  Del  |Backspc| Space |       |       |
+ *                           |       |       |Backspc|  Tab  |       |  |       |  Del  | Space |       |       |
  *                           |       |       |Command|  NAV  | NUMPD |  |       | ADJST |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, LT(_SAFE, KC_Q), KC_W,         LT(TOP_ROW, KC_F), LSFT_T(KC_P),      KC_G,                                                                                  KC_J,   RSFT_T(KC_L),      LT(TOP_ROW, KC_U), KC_Y,         LT(_SAFE, KC_SCLN), KC_MINS,
-      KC_CAPS,        KC_A,            LOPT_T(KC_R), LSFT_T(KC_S),      LT(TOP_ROW, KC_T), KC_D,                                                                                  KC_H,   LT(TOP_ROW, KC_N), RSFT_T(KC_E),      ROPT_T(KC_I), KC_O,               KC_QUOT,
-      _______,        LCTL_T(KC_Z),    KC_X,         KC_C,              KC_V,              KC_B,            _______,            _______,            _______, _______,             KC_K,   KC_M,              KC_COMM,           KC_DOT,       RCTL_T(KC_SLSH),    KC_ENTER,
-                                                     _______,           KC_BSPC,           LCMD_T(KC_BSPC), LT(NAV, KC_SPACE),  LT(NUMPAD, KC_TAB), KC_DEL,  LT(ADJUST, KC_BSPC), KC_SPC, _______,           _______
+      KC_BKTK_ESCAPE,       KC_Q,            KC_W,         KC_F,         KC_P,              KC_G,                                                                       KC_J,    KC_L,              KC_U,         KC_Y,         KC_SCLN,         KC_MINS,
+      LT(_SWITCH, KC_CAPS), LT(_SAFE, KC_A), LOPT_T(KC_R), LSFT_T(KC_S), LT(SYMBOLS, KC_T), KC_D,                                                                       KC_H,    LT(SYMBOLS, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), LT(_SAFE, KC_O), LT(_SWITCH, KC_QUOT),
+      _______,              LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,            _______,          _______,    _______, _______,            KC_K,    KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH), KC_ENTER,
+                                                           _______,      _______,           LCMD_T(KC_BSPC), LT(NAV, KC_TAB),  MO(NUMPAD), _______, LT(ADJUST, KC_DEL), KC_SPC,  _______,           _______
+    ),
+/*
+ * SWITCH
+ *
+ * ,-------------------------------------------------.                                  ,-------------------------------------------------.
+ * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
+ * |         | _SAFE |       |       |SYMBOLS|       |                                  |       |SYMBOLS|       |       | _SAFE |         |
+ * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
+ * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
+ *                           |       |       |       |  NAV  | NUMPD |  |       | ADJST |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           `---------------------------------------'  `---------------------------------------'
+ */
+    [_SWITCH] = LAYOUT(
+      _______, _______, _______, _______, _______,     _______,                                           _______, _______,     _______, _______, _______, _______,
+      _______, _______, _______, _______, TG(SYMBOLS), _______,                                           _______, TG(SYMBOLS), _______, _______, _______, _______,
+      _______, _______, _______, _______, _______,     _______, _______, _______,    _______, _______,    _______, _______,     _______, _______, _______, _______,
+                                 _______, _______,     _______, TG(NAV), TG(NUMPAD), _______, TG(ADJUST), _______, _______,     _______
     ),
 /*
  * Safe Layer: no mod-tap keys
@@ -138,7 +164,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |         |
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |Backspc|       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -146,12 +172,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, KC_Q, KC_W, KC_F,    KC_P,    KC_G,                                        KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
       _______, KC_A, KC_R, KC_S,    KC_T,    KC_D,                                        KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
       _______, KC_Z, KC_X, KC_C,    KC_V,    KC_B,    _______, _______, _______, _______, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, _______,
-                           _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+                           _______, _______, KC_BSPC, _______, _______, _______, _______, _______, _______, _______
     ),
 /*
  * Modified Number Pad
  * intended primarily for *entering numerical values*
- * all symbols can be found in familiar locations on the TOP_ROW layer
+ * all symbols can be found in familiar locations on the SYMBOLS layer
  * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
  * Added a dedicated tab here.
  *   It's common to tab after numbers, for example when autocompleting git branch names.
@@ -201,32 +227,35 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * Shows numbers and symbols in a modified top-row pattern, for password muscle memory and such
   * Pinky gets plus and equal sign because hyphen/underscore are already on the default layer.
   * Brackets, curly braces, backslashes and pipes are added bc they deserve easy access!
-  *   Right hand, home row.
-  *   Though it might seem intuitive to give brackets to the strongest fingers,
-  *     it feels more natural the way I have it.
+  *   Brackets and curly braces are right under parentheses.
+  *   Backslash and pipe are where forward slash lives on the default layer.
+  *   The keys over the "shift" and "top row" modifiers are left open (transparent).
+  * Also on this layer are reversed versions of the thumb keys
+  *   (space, delete, backspace, and tab),
+  *   largely so they're all avalailable from the left hand
+  *   when my right hand in on the mouse.
   *
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
   * |   ` ~   |  1 !  |  2 @  |  3 #  |  4 $  |  5 %  |                                  |  6 ^  |  7 &  |  8 *  |  9 (  |  0 )  |   = +   |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |  / |  |  [ {  |  ] }  |       |         |
+  * |         |       |       |       |       |       |                                  |       |       |       |  [ {  |  ] }  |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |  \ |  |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       |       |       |  |       |       |       |       |       |
+  *                           |       |       | Space |  Del  |       |  |       |  Tab  |Backspc|       |       |
   *                           |       |       |       |       |       |  |       |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
-     [TOP_ROW] = LAYOUT(
-       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
-       _______, _______, _______, _______, _______, _______,                                     _______, KC_BSLS, KC_LBRC, KC_RBRC, _______, _______,
-       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+     [SYMBOLS] = LAYOUT(
+       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                                                  KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
+       _______, _______, _______, _______, _______, _______,                                                               _______, _______, _______, KC_LBRC, KC_RBRC, _______,
+       _______, _______, _______, _______, _______, _______,        _______,         _______, _______, _______,            _______, _______, _______, _______, KC_BSLS, _______,
+                                  _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_DEL), _______, _______, LT(ADJUST, KC_TAB), KC_BSPC, _______, _______
      ),
 /*
  * Navigation Layer
  * Page up and down are not much used on a Mac, or even home and end.
  * Duplicated down arrow because I always forget it's in the home row.
- * Duplicated left and right arrows in the thumb row by analogy to backspace and delete in the default layer.
  * KC_SWITCH is for switching tabs on a Mac.
  *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
  *     Any other time it will just press tab.
@@ -246,7 +275,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |Control| Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
  * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |   ←   |       |   →   |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -254,7 +283,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
       KC_ESC,         _______,    KC_LOPT,          KC_LSFT,       KC_LCMD,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
       _______,        KC_LCTL,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
-                                                    _______,       _______,            _______, _______, _______, _______, KC_LEFT, _______, KC_RGHT, _______
+                                                    _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
   * Chrome
@@ -564,6 +593,10 @@ void matrix_scan_user(void) {
 
 // Lighting layers
 // https://docs.qmk.fm/#/feature_rgblight?id=lighting-layers
+// TODO: reconsider layer order in general, and colors in particular
+// TODO: consider trying a color for caps lock
+// TODO: try flashing both hands (disconnect TRRS, flash one at a time)
+// TODO: these actually don't even work right now!
 /* Popular colors to try:
     HSV_WHITE
     HSV_RED
@@ -631,14 +664,15 @@ void keyboard_post_init_user(void) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Both layers will light up if both kb layers are active
     rgblight_set_layer_state(0, layer_state_cmp(state, 0));
-    rgblight_set_layer_state(1, layer_state_cmp(state, 1));
-    rgblight_set_layer_state(2, layer_state_cmp(state, 2));
-    rgblight_set_layer_state(3, layer_state_cmp(state, 3));
-    rgblight_set_layer_state(4, layer_state_cmp(state, 4));
-    rgblight_set_layer_state(5, layer_state_cmp(state, 5));
-    rgblight_set_layer_state(6, layer_state_cmp(state, 6));
-    rgblight_set_layer_state(7, layer_state_cmp(state, 7));
+    rgblight_set_layer_state(0, layer_state_cmp(state, 1));
+    rgblight_set_layer_state(1, layer_state_cmp(state, 2));
+    rgblight_set_layer_state(2, layer_state_cmp(state, 3));
+    rgblight_set_layer_state(3, layer_state_cmp(state, 4));
+    rgblight_set_layer_state(4, layer_state_cmp(state, 5));
+    rgblight_set_layer_state(5, layer_state_cmp(state, 6));
+    rgblight_set_layer_state(6, layer_state_cmp(state, 7));
     rgblight_set_layer_state(7, layer_state_cmp(state, 8));
+    rgblight_set_layer_state(7, layer_state_cmp(state, 9));
     return state;
 }
 #endif
@@ -682,6 +716,9 @@ static void render_status(void) {
         case COLEMAK:
             oled_write_P(PSTR("Colemak\n"), false);
             break;
+        case _SWITCH:
+            oled_write_P(PSTR("Switch\n"), false);
+            break;
         case _SAFE:
             oled_write_P(PSTR("Safety\n"), false);
             break;
@@ -691,8 +728,8 @@ static void render_status(void) {
         case UNICODE:
             oled_write_P(PSTR("Unicode\n"), false);
             break;
-        case TOP_ROW:
-            oled_write_P(PSTR("Top Row\n"), false);
+        case SYMBOLS:
+            oled_write_P(PSTR("Symbols\n"), false);
             break;
         case NAV:
             oled_write_P(PSTR("Navigation\n"), false);
