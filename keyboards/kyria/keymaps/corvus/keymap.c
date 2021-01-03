@@ -59,6 +59,20 @@ uint16_t diacritical_mark_timer = 0;
 bool need_diacritical = false;
 bool turn_off_symbols = false;
 
+int8_t change_hue = 0;
+int8_t change_saturation = 0;
+int8_t change_value = 0;
+
+uint16_t hue_timer = 0;
+uint16_t saturation_timer = 0;
+uint16_t value_timer = 0;
+
+// seconds to cycle through 0-255 or back
+// technically using 1.024 ms, for an even 4 milliseconds per tick!
+const int8_t hue_seconds = 5;
+const int8_t saturation_seconds = 5;
+const int8_t value_seconds = 5;
+
 // TODO: Make the layers match the enum.
 enum layers {
     COLEMAK = 0,
@@ -79,7 +93,13 @@ enum custom_keycodes {
     KC_UNICODE,
     KC_CYCLE_INPUTS,
     KC_TOGGLE_INPUTS,
-    KC_SWITCH
+    KC_SWITCH,
+    KC_HUI,
+    KC_HUD,
+    KC_SAI,
+    KC_SAD,
+    KC_VAI,
+    KC_VAD
 };
 
 // to add layers, add them here, but also check `enum layers` above
@@ -328,8 +348,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [ADJUST] = LAYOUT(
       _______, _______, _______, _______, _______, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
-      _______, _______, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
-      _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
+      _______, _______, KC_HUI,  KC_SAI,  KC_VAI,  _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
+      _______, _______, KC_HUD,  KC_SAD,  KC_VAD,  _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
                                  KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______
     ),
 // /*
@@ -530,6 +550,54 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         // on release: nothing
                     }
                     break;
+                case KC_HUI:
+                    if (record->event.pressed) {
+                        hue_timer = timer_read();
+                        change_hue = 1;
+                    } else {
+                        change_hue = 0;
+                    }
+                    break;
+                case KC_HUD:
+                    if (record->event.pressed) {
+                        hue_timer = timer_read();
+                        change_hue = -1;
+                    } else {
+                        change_hue = 0;
+                    }
+                    break;
+                case KC_SAI:
+                    if (record->event.pressed) {
+                        saturation_timer = timer_read();
+                        change_saturation = 1;
+                    } else {
+                        change_saturation = 0;
+                    }
+                    break;
+                case KC_SAD:
+                    if (record->event.pressed) {
+                        saturation_timer = timer_read();
+                        change_saturation = -1;
+                    } else {
+                        change_saturation = 0;
+                    }
+                    break;
+                case KC_VAI:
+                    if (record->event.pressed) {
+                        value_timer = timer_read();
+                        change_value = 1;
+                    } else {
+                        change_value = 0;
+                    }
+                    break;
+                case KC_VAD:
+                    if (record->event.pressed) {
+                        value_timer = timer_read();
+                        change_value = -1;
+                    } else {
+                        change_value = 0;
+                    }
+                    break;
             }
         }
     return true;
@@ -541,6 +609,55 @@ void matrix_scan_user(void) {
             layer_on(SYMBOLS);
             need_diacritical = false;
             turn_off_symbols = true;
+        }
+    } else {
+        switch (change_hue) {
+            case 0:
+                break;
+            case 1:
+                if (timer_elapsed(hue_timer) > (hue_seconds * 4)) {
+                    hue_timer = timer_read();
+                    rgblight_increase_hue();
+                }
+                break;
+            case -1:
+                if (timer_elapsed(hue_timer) > (hue_seconds * 4)) {
+                    hue_timer = timer_read();
+                    rgblight_decrease_hue();
+                }
+                break;
+        }
+        switch (change_saturation) {
+            case 0:
+                break;
+            case 1:
+                if (timer_elapsed(saturation_timer) > (saturation_seconds * 4)) {
+                    saturation_timer = timer_read();
+                    rgblight_increase_sat();
+                }
+                break;
+            case -1:
+                if (timer_elapsed(saturation_timer) > (saturation_seconds * 4)) {
+                    saturation_timer = timer_read();
+                    rgblight_decrease_sat();
+                }
+                break;
+        }
+        switch (change_value) {
+            case 0:
+                break;
+            case 1:
+                if (timer_elapsed(value_timer) > (value_seconds * 4)) {
+                    value_timer = timer_read();
+                    rgblight_increase_val();
+                }
+                break;
+            case -1:
+                if (timer_elapsed(value_timer) > (value_seconds * 4)) {
+                    value_timer = timer_read();
+                    rgblight_decrease_val();
+                }
+                break;
         }
     }
 }
