@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include <lib/lib8tion/lib8tion.h>
 
 // Wanted to use unicode map for U-2212, true minus
 // https://docs.qmk.fm/#/feature_unicode?id=unicode-map
@@ -59,19 +60,16 @@ uint16_t diacritical_mark_timer = 0;
 bool need_diacritical = false;
 bool turn_off_symbols = false;
 
+#ifdef RGBLIGHT_ENABLE
+// flags. 0 = no change, 1 = increment, -1 = decrement.
 int8_t change_hue = 0;
-int8_t change_saturation = 0;
-int8_t change_value = 0;
+int8_t change_sat = 0;
+int8_t change_val = 0;
 
-uint16_t hue_timer = 0;
-uint16_t saturation_timer = 0;
-uint16_t value_timer = 0;
-
-// seconds to cycle through 0-255 or back
-// technically using 1.024 ms, for an even 4 milliseconds per tick!
-const int8_t hue_seconds = 5;
-const int8_t saturation_seconds = 5;
-const int8_t value_seconds = 5;
+// timer to control color change speed
+uint16_t change_timer = 0;
+const uint16_t change_tick  = 15;
+#endif
 
 // TODO: Make the layers match the enum.
 enum layers {
@@ -93,13 +91,7 @@ enum custom_keycodes {
     KC_UNICODE,
     KC_CYCLE_INPUTS,
     KC_TOGGLE_INPUTS,
-    KC_SWITCH,
-    KC_HUI,
-    KC_HUD,
-    KC_SAI,
-    KC_SAD,
-    KC_VAI,
-    KC_VAD
+    KC_SWITCH
 };
 
 // to add layers, add them here, but also check `enum layers` above
@@ -348,8 +340,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [ADJUST] = LAYOUT(
       _______, _______, _______, _______, _______, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
-      _______, _______, KC_HUI,  KC_SAI,  KC_VAI,  _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
-      _______, _______, KC_HUD,  KC_SAD,  KC_VAD,  _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
+      _______, _______, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
+      _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
                                  KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______
     ),
 // /*
@@ -550,58 +542,53 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         // on release: nothing
                     }
                     break;
-                case KC_HUI:
-                    if (record->event.pressed) {
-                        hue_timer = timer_read();
-                        change_hue = 1;
-                    } else {
-                        change_hue = 0;
-                    }
-                    break;
-                case KC_HUD:
-                    if (record->event.pressed) {
-                        hue_timer = timer_read();
-                        change_hue = -1;
-                    } else {
-                        change_hue = 0;
-                    }
-                    break;
-                case KC_SAI:
-                    if (record->event.pressed) {
-                        saturation_timer = timer_read();
-                        change_saturation = 1;
-                    } else {
-                        change_saturation = 0;
-                    }
-                    break;
-                case KC_SAD:
-                    if (record->event.pressed) {
-                        saturation_timer = timer_read();
-                        change_saturation = -1;
-                    } else {
-                        change_saturation = 0;
-                    }
-                    break;
-                case KC_VAI:
-                    if (record->event.pressed) {
-                        value_timer = timer_read();
-                        change_value = 1;
-                    } else {
-                        change_value = 0;
-                    }
-                    break;
-                case KC_VAD:
-                    if (record->event.pressed) {
-                        value_timer = timer_read();
-                        change_value = -1;
-                    } else {
-                        change_value = 0;
-                    }
-                    break;
             }
         }
+   return true;
+}
+
+#ifdef RGBLIGHT_ENABLE
+bool process_record_user_rgb(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        switch (keycode) {
+            // clang-format off
+            case RGB_HUI: change_timer = timer_read(); change_hue =  1; return false;
+            case RGB_HUD: change_timer = timer_read(); change_hue = -1; return false;
+            case RGB_SAI: change_timer = timer_read(); change_sat =  1; return false;
+            case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
+            case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
+            case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
+            // clang-format on
+        }
+    } else {
+        bool rgb_done = false;
+        switch (keycode) {
+            case RGB_HUI:
+            case RGB_HUD:
+                change_hue = 0;
+                rgb_done   = true;
+                break;
+            case RGB_SAI:
+            case RGB_SAD:
+                change_sat = 0;
+                rgb_done   = true;
+                break;
+            case RGB_VAI:
+            case RGB_VAD:
+                change_val = 0;
+                rgb_done   = true;
+                break;
+        }
+
+        if (rgb_done) {
+            HSV final = rgblight_get_hsv();
+            rgblight_sethsv(final.h, final.s, final.v);
+        }
+    }
+
     return true;
 }
+#endif
 
 void matrix_scan_user(void) {
     if (need_diacritical) {
@@ -610,57 +597,23 @@ void matrix_scan_user(void) {
             need_diacritical = false;
             turn_off_symbols = true;
         }
-    } else {
-        switch (change_hue) {
-            case 0:
-                break;
-            case 1:
-                if (timer_elapsed(hue_timer) > (hue_seconds * 4)) {
-                    hue_timer = timer_read();
-                    rgblight_increase_hue();
-                }
-                break;
-            case -1:
-                if (timer_elapsed(hue_timer) > (hue_seconds * 4)) {
-                    hue_timer = timer_read();
-                    rgblight_decrease_hue();
-                }
-                break;
-        }
-        switch (change_saturation) {
-            case 0:
-                break;
-            case 1:
-                if (timer_elapsed(saturation_timer) > (saturation_seconds * 4)) {
-                    saturation_timer = timer_read();
-                    rgblight_increase_sat();
-                }
-                break;
-            case -1:
-                if (timer_elapsed(saturation_timer) > (saturation_seconds * 4)) {
-                    saturation_timer = timer_read();
-                    rgblight_decrease_sat();
-                }
-                break;
-        }
-        switch (change_value) {
-            case 0:
-                break;
-            case 1:
-                if (timer_elapsed(value_timer) > (value_seconds * 4)) {
-                    value_timer = timer_read();
-                    rgblight_increase_val();
-                }
-                break;
-            case -1:
-                if (timer_elapsed(value_timer) > (value_seconds * 4)) {
-                    value_timer = timer_read();
-                    rgblight_decrease_val();
-                }
-                break;
+    }
+}
+
+#ifdef RGBLIGHT_ENABLE
+void matrix_scan_user_rgb(void) {
+    if (change_hue != 0 || change_val != 0 || change_sat != 0) {
+        if (timer_elapsed(change_timer) > change_tick) {
+            HSV hsv = rgblight_get_hsv();
+            hsv.h += change_hue;
+            hsv.s = change_sat > 0 ? qadd8(hsv.s, (uint8_t) change_sat) : qsub8(hsv.s, (uint8_t) -change_sat);
+            hsv.v = change_val > 0 ? qadd8(hsv.v, (uint8_t) change_val) : qsub8(hsv.v, (uint8_t) -change_val);
+            rgblight_sethsv_noeeprom(hsv.h, hsv.s, hsv.v);
+            change_timer = timer_read();
         }
     }
 }
+#endif
 
 layer_state_t layer_state_set_kb(layer_state_t state) {
     switch (get_highest_layer(state)) {

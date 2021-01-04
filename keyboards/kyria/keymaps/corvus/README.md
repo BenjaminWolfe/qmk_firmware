@@ -97,8 +97,8 @@ just hold it a little longer for the latter.
 
 # Open Tasks and Ideas
 
-* Keep tinkering with positioning of thumb keys:
-  space, delete, backspace, and tab.
+* Lighting is currently a work in progress based on this StackOverflow post:
+  https://stackoverflow.com/questions/65556317/qmk-rgb-saturation-bottoms-out
 * Consider auto-shift; nothing wrong with using that _and_ the modifier key.
 * Consider using aliases for keys as outlined in the same article mentioned above.
   It certainly makes the code easier to read.
