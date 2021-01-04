@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
-#include <lib/lib8tion/lib8tion.h>
+#include <lib/lib8tion/lib8tion.h> // for rgb underglow
 
 // Wanted to use unicode map for U-2212, true minus
 // https://docs.qmk.fm/#/feature_unicode?id=unicode-map
@@ -60,6 +60,8 @@ uint16_t diacritical_mark_timer = 0;
 bool need_diacritical = false;
 bool turn_off_symbols = false;
 
+#define HSV_DEFAULT 152, 255, 255
+
 // flags. 0 = no change, 1 = increment, -1 = decrement.
 int8_t change_hue = 0;
 int8_t change_sat = 0;
@@ -68,6 +70,8 @@ int8_t change_val = 0;
 // timer to control color change speed
 uint16_t change_timer = 0;
 const uint16_t change_tick  = 15;
+
+char hsl_buffer[3];
 
 // TODO: Make the layers match the enum.
 enum layers {
@@ -89,7 +93,11 @@ enum custom_keycodes {
     KC_UNICODE,
     KC_CYCLE_INPUTS,
     KC_TOGGLE_INPUTS,
-    KC_SWITCH
+    KC_SWITCH,
+    RGB_RST,
+    RGB_HUG,
+    RGB_SAG,
+    RGB_VAG
 };
 
 // to add layers, add them here, but also check `enum layers` above
@@ -321,14 +329,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      ),
 /*
  * Adjust Layer
+ * xxG keys are getters; they print the current hue saturation, or value.
  * There's so much more we can do here and so many ways to organize it.
  * It's worth splitting this into multiple layers and considering the UX.
  * But for now...
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |       |  F7   |  F8   |  F9   |  F10  |         |
+ * |         |       |  HUG  |  SAG  |  VAG  |       |                                  |       |  F7   |  F8   |  F9   |  F10  |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |  HUI  |  SAI  |  VAI  |       |                                  |       |  F4   |  F5   |  F6   |  F11  |         |
+ * |         | Reset |  HUI  |  SAI  |  VAI  |       |                                  |       |  F4   |  F5   |  F6   |  F11  |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |  HUD  |  SAD  |  VAD  |       |       | VolUp |  |       |       |       |  F1   |  F2   |  F3   |  F12  |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
@@ -337,8 +346,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [ADJUST] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
-      _______, _______, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
+      _______, _______, RGB_HUG, RGB_SAG, RGB_VAG, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
+      _______, RGB_RST, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
       _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
                                  KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______
     ),
@@ -489,6 +498,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
                 case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
                 case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
+                case RGB_RST:
+                    rgblight_sethsv(HSV_DEFAULT);
+                    break;
+                case RGB_HUG:
+                    send_string(itoa(rgblight_get_hue(), hsl_buffer, 10));
+                    break;
+                case RGB_SAG:
+                    send_string(itoa(rgblight_get_sat(), hsl_buffer, 10));
+                    break;
+                case RGB_VAG:
+                    send_string(itoa(rgblight_get_val(), hsl_buffer, 10));
+                    break;
                 case KC_BKTK_ESCAPE:  // One-key backtick/escape (see also key release)
                     copy_paste_timer = timer_read();
                     break;
@@ -632,104 +653,6 @@ void matrix_scan_user(void) {
             SEND_STRING("Best,\n\nBenjamin");
         }
     }
-}
-#endif
-
-#ifdef RGBLIGHT_ENABLE
-// https://github.com/qmk/qmk_firmware/blob/master/quantum/rgblight_list.h#L55
-// picked a nice blue with max saturation and luminance, rest are evenly spaced hues
-#define HSV_BLUISH 152, 255, 255
-#define HSV_COLOR1 184, 255, 255
-#define HSV_COLOR2 216, 255, 255
-#define HSV_COLOR3 248, 255, 255
-#define HSV_COLOR4  24, 255, 255
-#define HSV_COLOR5  56, 255, 255
-#define HSV_COLOR6  88, 255, 255
-#define HSV_COLOR7 120, 255, 255
-
-// Lighting layers
-// https://docs.qmk.fm/#/feature_rgblight?id=lighting-layers
-// TODO: reconsider layer order in general, and colors in particular
-// TODO: consider trying a color for caps lock
-// TODO: try flashing both hands (disconnect TRRS, flash one at a time)
-// TODO: these actually don't even work right now!
-/* Popular colors to try:
-    HSV_WHITE
-    HSV_RED
-    HSV_CORAL
-    HSV_ORANGE
-    HSV_GOLDENROD
-    HSV_GOLD
-    HSV_YELLOW
-    HSV_CHARTREUSE
-    HSV_GREEN
-    HSV_SPRINGGREEN
-    HSV_TURQUOISE
-    HSV_TEAL
-    HSV_CYAN
-    HSV_AZURE
-    HSV_BLUE
-    HSV_PURPLE
-    HSV_MAGENTA
-    HSV_PINK
-*/
-const rgblight_segment_t PROGMEM color_layer_1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_BLUISH}
-);
-const rgblight_segment_t PROGMEM color_layer_2[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR1}
-);
-const rgblight_segment_t PROGMEM color_layer_3[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR2}
-);
-const rgblight_segment_t PROGMEM color_layer_4[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR3}
-);
-const rgblight_segment_t PROGMEM color_layer_5[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR4}
-);
-const rgblight_segment_t PROGMEM color_layer_6[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR5}
-);
-const rgblight_segment_t PROGMEM color_layer_7[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR6}
-);
-const rgblight_segment_t PROGMEM color_layer_8[] = RGBLIGHT_LAYER_SEGMENTS(
-    {1, 20, HSV_COLOR7}
-);
-
-// Now define the array of layers. Later layers take precedence
-const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    color_layer_1,
-    color_layer_2,
-    color_layer_3,
-    color_layer_4,
-    color_layer_5,
-    color_layer_6,
-    color_layer_7,
-    color_layer_8
-);
-
-void keyboard_post_init_user(void) {
-  rgblight_enable_noeeprom(); // Enables RGB, without saving settings
-  rgblight_sethsv_noeeprom(HSV_BLUISH);
-  rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
-  rgblight_layers = my_rgb_layers; // Enable the LED layers
-}
-
-layer_state_t layer_state_set_user(layer_state_t state) {
-    // Both layers will light up if both kb layers are active
-    rgblight_set_layer_state(0, layer_state_cmp(state, 0));
-    rgblight_set_layer_state(0, layer_state_cmp(state, 1));
-    rgblight_set_layer_state(1, layer_state_cmp(state, 2));
-    rgblight_set_layer_state(2, layer_state_cmp(state, 3));
-    rgblight_set_layer_state(3, layer_state_cmp(state, 4));
-    rgblight_set_layer_state(4, layer_state_cmp(state, 5));
-    rgblight_set_layer_state(5, layer_state_cmp(state, 6));
-    rgblight_set_layer_state(6, layer_state_cmp(state, 7));
-    rgblight_set_layer_state(7, layer_state_cmp(state, 8));
-    rgblight_set_layer_state(7, layer_state_cmp(state, 9));
-    return state;
 }
 #endif
 

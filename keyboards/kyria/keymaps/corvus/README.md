@@ -95,21 +95,23 @@ media controls, and underglow lighting adjustment.
 The same key is used for both backtick and escape;
 just hold it a little longer for the latter.
 
+I would love to do more with the underglow lighting;
+I'm currently leaving that simple for file size reasons.
+I particularly like the idea of visual feedback for caps locks and layer changes;
+color works well for that since you can see it with your peripheral vision.
+Oddly that worked at one point, and then it didn't, and I don't remember when.
+I do have nice functionality in place for changing the color and getting its numbers,
+thanks in large part to [this StackOverflow post][lighting-stackoverflow].
+
 # Open Tasks and Ideas
 
-* Lighting is currently a work in progress based on this StackOverflow post:
-  https://stackoverflow.com/questions/65556317/qmk-rgb-saturation-bottoms-out
 * Consider auto-shift; nothing wrong with using that _and_ the modifier key.
-* Consider using aliases for keys as outlined in the same article mentioned above.
+* Consider using aliases for keys as outlined in the home row modifiers article.
   It certainly makes the code easier to read.
 * Command-shift-x for 1Password?
-* Nicer use of layer colors. Make it work in the first place!
 * More intentional arrangement of RGB, media, and function keys.
-  Consider a way to print current color after querying HSV values:
-  https://beta.docs.qmk.fm/using-qmk/hardware-features/lighting/feature_rgblight#query
 * Reduce file size to be able to use the leader key functionality.
 * Add emoji support, in some way?
-  Consider even a smile, which should be an easy 2-key adjacent hop.
 * Get back my unicode 2212 key?
 * Write out anything else worth documenting?
 
@@ -120,3 +122,5 @@ just hold it a little longer for the latter.
 * Figure out how to actually place my hands farther apart at my desk…
   like a very wide keyboard tray.
 * Most importantly, be very sure I follow ergonomic best practices.
+
+[lighting-stackoverflow]: https://stackoverflow.com/questions/65556317/qmk-rgb-saturation-bottoms-out
