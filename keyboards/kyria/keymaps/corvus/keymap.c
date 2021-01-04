@@ -124,7 +124,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
  * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |Backspc|  Tab  |  |  Del  | Space |       |       |       |
+ *                           |       |       |       |Backspc|  Del  |  |  Tab  | Space |       |       |       |
  *                           |       |       | NUMPD |Command|  NAV  |  | ADJST |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -132,7 +132,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_BKTK_ESCAPE,       KC_Q,            KC_W,         KC_F,         KC_P,              KC_G,                                                                       KC_J,    KC_L,              KC_U,         KC_Y,         KC_SCLN,         KC_MINS,
       LT(_SWITCH, KC_CAPS), LT(_SAFE, KC_A), LOPT_T(KC_R), LSFT_T(KC_S), LT(SYMBOLS, KC_T), KC_D,                                                                       KC_H,    LT(SYMBOLS, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), LT(_SAFE, KC_O), LT(_SWITCH, KC_QUOT),
       _______,              LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,       _______,         _______,          _______,            _______, KC_K,    KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH), KC_ENTER,
-                                                           _______,      _______,           MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_TAB),  LT(ADJUST, KC_DEL), KC_SPC,  _______, _______,           _______
+                                                           _______,      _______,           MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_DEL),  LT(ADJUST, KC_TAB), KC_SPC,  _______, _______,           _______
     ),
 /*
  * SWITCH
@@ -168,7 +168,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |         |
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |Backspc|  Tab  |  |  Del  |       |       |       |       |
+ *                           |       |       |       |Backspc|  Del  |  |  Tab  |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
@@ -176,7 +176,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, KC_Q, KC_W, KC_F,    KC_P,    KC_G,                                        KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
       _______, KC_A, KC_R, KC_S,    KC_T,    KC_D,                                        KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
       _______, KC_Z, KC_X, KC_C,    KC_V,    KC_B,    _______, _______, _______, _______, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, _______,
-                           _______, _______, _______, KC_BSPC, KC_TAB,  KC_DEL,  _______, _______, _______, _______
+                           _______, _______, _______, KC_BSPC, KC_DEL,  KC_TAB,  _______, _______, _______, _______
     ),
 /*
  * Modified Number Pad
@@ -246,7 +246,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
   * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |  \ |  |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       | Space |  Del  |  |  Tab  |Backspc|       |       |       |
+  *                           |       |       |       | Space |  Tab  |  |  Del  |Backspc|       |       |       |
   *                           |       |       |       |Command|  NAV  |  | ADJST |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
@@ -254,7 +254,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                                                  KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
        _______, _______, _______, _______, _______, _______,                                                               _______, _______, _______, KC_LBRC, KC_RBRC, _______,
        _______, _______, _______, _______, _______, _______, _______,        _______,         _______,            _______, _______, _______, _______, _______, KC_BSLS, _______,
-                                  _______, _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_DEL), LT(ADJUST, KC_TAB), KC_BSPC, _______, _______, _______
+                                  _______, _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_TAB), LT(ADJUST, KC_DEL), KC_BSPC, _______, _______, _______
      ),
 /*
  * Navigation Layer

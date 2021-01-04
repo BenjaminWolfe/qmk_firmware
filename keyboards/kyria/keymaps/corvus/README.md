@@ -81,8 +81,9 @@ in the second thumb key from the center of the layout,
 so that's what I've chosen to do.
 I've put the space bar on the right hand where I tend to use it,
 and the backspace on the left hand.
-For now, tab and delete are one position out on the left and right hands, respectively.
-(It seems slightly more intuitive to swap those, though.)
+Tab and delete are thematically organized next to space and backspace, respectively.
+I originally had them reversed to match historical handedness,
+but I decided the elegance was worth the departure from precedent.
 You can also reverse the handedness of these keys by switching to the symbols layer.
 This is useful when I want to be able to use them all with my left hand alone.
 
