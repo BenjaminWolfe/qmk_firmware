@@ -60,7 +60,6 @@ uint16_t diacritical_mark_timer = 0;
 bool need_diacritical = false;
 bool turn_off_symbols = false;
 
-#ifdef RGBLIGHT_ENABLE
 // flags. 0 = no change, 1 = increment, -1 = decrement.
 int8_t change_hue = 0;
 int8_t change_sat = 0;
@@ -69,7 +68,6 @@ int8_t change_val = 0;
 // timer to control color change speed
 uint16_t change_timer = 0;
 const uint16_t change_tick  = 15;
-#endif
 
 // TODO: Make the layers match the enum.
 enum layers {
@@ -461,7 +459,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (
+    bool check_diacritical = (
         (IS_LAYER_ON(_SAFE)) &&
         (
             (keycode == KC_L) ||
@@ -475,120 +473,92 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             (keycode == KC_O) ||
             (keycode == KC_Z) ||
             (keycode == KC_C)
-        )) {
-            if (record->event.pressed) {
-                diacritical_mark_timer = timer_read();
-                need_diacritical = true;
-            } else {
-                if (turn_off_symbols) {
-                    turn_off_symbols = false;
-                    layer_off(SYMBOLS);
-                } else {
-                    need_diacritical = false;
-                }
-            }
+        )
+    );
+    if (record->event.pressed) {
+        // on press...
+        if (check_diacritical) {
+            diacritical_mark_timer = timer_read();
+            need_diacritical = true;
         } else {
             switch (keycode) {
+                // rgb keys; see also key-release code below
+                case RGB_HUI: change_timer = timer_read(); change_hue =  1; return false;
+                case RGB_HUD: change_timer = timer_read(); change_hue = -1; return false;
+                case RGB_SAI: change_timer = timer_read(); change_sat =  1; return false;
+                case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
+                case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
+                case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
+                case KC_BKTK_ESCAPE:  // One-key backtick/escape (see also key release)
+                    copy_paste_timer = timer_read();
+                    break;
+                case KC_UNICODE:
+                    // on press: switch to UNICODE layer, depress option + leave it down
+                    // see also key release
+                    layer_on(UNICODE);
+                    SEND_STRING(SS_DOWN(X_LOPT));
+                    break;
+                case KC_CYCLE_INPUTS:
+                    // on press: control-option-space
+                    // only accessed from UNICODE layer, where option is already depressed
+                    // then option key up and down to reset for unicode keystrokes
+                    SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
+                    break;
+                case KC_TOGGLE_INPUTS:
+                    // on press: control-space
+                    // only accessed from UNICODE layer, where option is already depressed
+                    SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
+                    break;
+                case KC_SWITCH:
+                    // on press: depress command if not already depressed; tap tab
+                    // command is released when switching back to default layer
+                    if (!command_tracker) {
+                        register_code(KC_LCMD);
+                        command_tracker = true;
+                    }
+                    tap_code(KC_TAB);
+                    break;
+            }
+        }
+    } else {
+        // on release...
+        if (check_diacritical) {
+            if (turn_off_symbols) {
+                turn_off_symbols = false;
+                layer_off(SYMBOLS);
+            } else {
+                need_diacritical = false;
+            }
+        } else {
+            bool rgb_done = false;
+            switch (keycode) {
+                case RGB_HUI:
+                case RGB_HUD: change_hue = 0; rgb_done = true; break;
+                case RGB_SAI:
+                case RGB_SAD: change_sat = 0; rgb_done = true; break;
+                case RGB_VAI:
+                case RGB_VAD: change_val = 0; rgb_done = true; break;
                 case KC_BKTK_ESCAPE:  // One key backtick/escape
-                    if (record->event.pressed) {
-                        copy_paste_timer = timer_read();
-                    } else {
-                        if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, escape
-                            tap_code16(KC_ESCAPE);
-                        } else { // Tap, backtick
-                            tap_code16(KC_GRAVE);
-                        }
+                    if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, escape
+                        tap_code16(KC_ESCAPE);
+                    } else { // Tap, backtick
+                        tap_code16(KC_GRAVE);
                     }
                     break;
                 case KC_UNICODE:
-                    if (record->event.pressed) {
-                        // on press: switch to UNICODE layer, depress option and leave it down
-                        layer_on(UNICODE);
-                        SEND_STRING(SS_DOWN(X_LOPT));
-                    } else {
-                        // on release: release option and deactivate UNICODE layer
-                        SEND_STRING(SS_UP(X_LOPT));
-                        layer_off(UNICODE);
-                    }
-                    break;
-                case KC_CYCLE_INPUTS:
-                    if (record->event.pressed) {
-                        // on press: control-option-space
-                        // only accessed from UNICODE layer, where option is already depressed
-                        // then option key up and down to reset for unicode keystrokes
-                        SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
-                    } else {
-                        // on release: nothing
-                    }
-                    break;
-                case KC_TOGGLE_INPUTS:
-                    if (record->event.pressed) {
-                        // on press: control-space
-                        // only accessed from UNICODE layer, where option is already depressed
-                        SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
-                    } else {
-                        // on release: nothing
-                    }
-                    break;
-                case KC_SWITCH:
-                    if (record->event.pressed) {
-                        // on press: depress command if not already depressed; tap tab
-                        if (!command_tracker) {
-                            register_code(KC_LCMD);
-                            command_tracker = true;
-                        }
-                        tap_code(KC_TAB);
-                    } else {
-                        // on release: nothing
-                    }
+                    // on release: release option and deactivate UNICODE layer
+                    SEND_STRING(SS_UP(X_LOPT));
+                    layer_off(UNICODE);
                     break;
             }
-        }
-   return true;
-}
-
-#ifdef RGBLIGHT_ENABLE
-bool process_record_user_rgb(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        switch (keycode) {
-            // clang-format off
-            case RGB_HUI: change_timer = timer_read(); change_hue =  1; return false;
-            case RGB_HUD: change_timer = timer_read(); change_hue = -1; return false;
-            case RGB_SAI: change_timer = timer_read(); change_sat =  1; return false;
-            case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
-            case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
-            case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
-            // clang-format on
-        }
-    } else {
-        bool rgb_done = false;
-        switch (keycode) {
-            case RGB_HUI:
-            case RGB_HUD:
-                change_hue = 0;
-                rgb_done   = true;
-                break;
-            case RGB_SAI:
-            case RGB_SAD:
-                change_sat = 0;
-                rgb_done   = true;
-                break;
-            case RGB_VAI:
-            case RGB_VAD:
-                change_val = 0;
-                rgb_done   = true;
-                break;
-        }
-
-        if (rgb_done) {
-            HSV final = rgblight_get_hsv();
-            rgblight_sethsv(final.h, final.s, final.v);
+            if (rgb_done) {
+                HSV final = rgblight_get_hsv();
+                rgblight_sethsv(final.h, final.s, final.v);
+            }
         }
     }
-
     return true;
 }
-#endif
 
 void matrix_scan_user(void) {
     if (need_diacritical) {
@@ -597,12 +567,7 @@ void matrix_scan_user(void) {
             need_diacritical = false;
             turn_off_symbols = true;
         }
-    }
-}
-
-#ifdef RGBLIGHT_ENABLE
-void matrix_scan_user_rgb(void) {
-    if (change_hue != 0 || change_val != 0 || change_sat != 0) {
+    } else if (change_hue != 0 || change_val != 0 || change_sat != 0) {
         if (timer_elapsed(change_timer) > change_tick) {
             HSV hsv = rgblight_get_hsv();
             hsv.h += change_hue;
@@ -613,7 +578,6 @@ void matrix_scan_user_rgb(void) {
         }
     }
 }
-#endif
 
 layer_state_t layer_state_set_kb(layer_state_t state) {
     switch (get_highest_layer(state)) {
