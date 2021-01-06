@@ -257,7 +257,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Navigation Layer
  * Page up and down are not much used on a Mac, or even home and end.
- * Duplicated down arrow because I always forget it's in the home row.
  * KC_SWITCH is for switching tabs on a Mac.
  *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
  *     Any other time it will just press tab.
@@ -271,10 +270,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Esc   |       |  Opt  | Shift |Command| Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |   Esc   |       |Command| Shift |  Opt  | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
- * |         |Control| Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |   ↓   |       |       |         |
+ * |         |Control| Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |       |       |       |         |
  * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |       |       |       |
@@ -283,8 +282,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [NAV] = LAYOUT(
       LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         _______,    KC_LOPT,          KC_LSFT,       KC_LCMD,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______,        KC_LCTL,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, KC_DOWN, _______, _______, _______,
+      KC_ESC,         _______,    KC_LCMD,          KC_LSFT,       KC_LOPT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        KC_LCTL,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                                     _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*

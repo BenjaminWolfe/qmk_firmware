@@ -55,6 +55,17 @@ is safe layer, option, shift, symbol layer,
 with command placed prominently at the left thumb,
 and control relegated to the Z and forward slash positions.
 
+I'm experimenting with my home row modifier order specifically in the Nav layer.
+You would expect it to be confusing to switch where the option key lives
+from one layer to another, moving it from the ring finger to the index.
+In fact, it's the opposite.
+Navigation is an entirely different mode of thought,
+and an entirely separate use of the option key.
+In navigation mode, it makes most sense
+to use the near finger (the index) to go to the end of the word,
+and to use the far finger (the ring) to go all the way to the end of the line.
+I found again and again that doing it the other way around only threw me.
+
 It's popular among keyboarding enthusiasts to argue
 that caps lock should not have a place in the home row.
 I disagree.
