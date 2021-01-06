@@ -114,8 +114,21 @@ Oddly that worked at one point, and then it didn't, and I don't remember when.
 I do have nice functionality in place for changing the color and getting its numbers,
 thanks in large part to [this StackOverflow post][lighting-stackoverflow].
 
+At one point I used [tapdance][tapdance] for all kinds of fancy functionality
+in the nav layer:
+a key for cut, copy, and paste,
+another for undo and redo,
+and a third for find and replace.
+None of these added enough value though
+(especially not cut, copy, and paste, as the shortcuts are already so easy to find),
+and removing them drastically improved my firmware size (by more than a kilobyte!).
+I'm currently tinkering with new ways to handle undo-redo and find & replace.
+
 # Open Tasks and Ideas
 
+* Tinker with the keys mentioned in the last paragraph above.
+* Screenshot key, command-shift-4.
+* VS Code format key, option-shift-f.
 * Consider auto-shift; nothing wrong with using that _and_ the modifier key.
 * Consider using aliases for keys as outlined in the home row modifiers article.
   It certainly makes the code easier to read.
@@ -135,3 +148,4 @@ thanks in large part to [this StackOverflow post][lighting-stackoverflow].
 * Most importantly, be very sure I follow ergonomic best practices.
 
 [lighting-stackoverflow]: https://stackoverflow.com/questions/65556317/qmk-rgb-saturation-bottoms-out
+[tapdance]: https://beta.docs.qmk.fm/using-qmk/software-features/feature_tap_dance

@@ -21,39 +21,7 @@
 // however, firmware was too large.
 // see https://github.com/qmk/qmk_firmware/issues/3224
 // via https://thomasbaart.nl/2018/12/01/reducing-firmware-size-in-qmk/
-
-// Tap Dance declarations
-// https://docs.qmk.fm/#/feature_tap_dance?id=example-4
-// https://www.reddit.com/r/olkb/comments/8i3zq9/qmk_tap_dance_and_momentary_layer_switch/dyzavhu
-typedef struct {
-    bool is_press_action;
-    uint8_t state;
-} tap;
-
-enum {
-    SINGLE_TAP = 1,
-    SINGLE_HOLD,
-    DOUBLE_TAP,
-    DOUBLE_HOLD,
-    DOUBLE_SINGLE_TAP, // Send two single taps
-    TRIPLE_TAP,
-    TRIPLE_HOLD
-};
-
-// Tap dance enums
-enum {
-    COPY_CUT_PASTE,
-    UNDO_REDO,
-    FIND_REPLACE
-};
-
-uint8_t cur_dance(qk_tap_dance_state_t *state);
-
-// For each advanced tap dance. Put these here so they can be used in any keymap
-void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data);
-void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data);
-
-uint16_t copy_paste_timer;
+uint16_t escape_timer;
 bool command_tracker = false;
 
 uint16_t diacritical_mark_timer = 0;
@@ -263,28 +231,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *     Command will be released when dropping out of the layer
  *     (see layer_state_set_kb below).
  * use CHROME and VSCODE layers to navigate between tabs
- * COPY_CUT_PASTE: tap to copy, double-tap to cut, hold to paste.
- * UNDO_REDO: tap to undo (command-z), double-tap to redo (command-shift-z).
- * FIND_REPLACE: tap to find (command-f), double-tap to replace (command-option-f, as defined in VS Code defaults).
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |   Esc   |       |Command| Shift |  Opt  | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       | Find  | Undo  |  Cpy  |       |       |       |  |       |       |       |       |       |       |       |         |
- * |         |Control| Repl  | Redo  |  Cut  |       |       |       |  |       |       |       |       |       |       |       |         |
- * |         |       |       |       | Paste |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),       MO(VSCODE),    MO(CHROME),         _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         _______,    KC_LCMD,          KC_LSFT,       KC_LOPT,            KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______,        KC_LCTL,    TD(FIND_REPLACE), TD(UNDO_REDO), TD(COPY_CUT_PASTE), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                                    _______,       _______,            _______, _______, _______, _______, _______, _______, _______, _______
+      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W), MO(VSCODE), MO(CHROME), _______,                                     _______, _______, KC_UP,   _______, _______, _______,
+      KC_ESC,         _______,    KC_LCMD,    KC_LSFT,    KC_LOPT,    KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        KC_LCTL,    _______,    _______,    _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                              _______,    _______,    _______, _______, _______, _______, _______, _______, _______, _______
     ),
  /*
   * Chrome
@@ -372,100 +335,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //     ),
 };
 
-// https://docs.qmk.fm/#/feature_tap_dance?id=example-4
-/* Return an integer that corresponds to what kind of tap dance should be executed.
- *
- * How to figure out tap dance state: interrupted and pressed.
- *
- * Interrupted: If the state of a dance dance is "interrupted", that means that another key has been hit
- *  under the tapping term. This is typically indicative that you are trying to "tap" the key.
- *
- * Pressed: Whether or not the key is still being pressed. If this value is true, that means the tapping term
- *  has ended, but the key is still being pressed down. This generally means the key is being "held".
- *
- * One thing that is currently not possible with qmk software in regards to tap dance is to mimic the "permissive hold"
- *  feature. In general, advanced tap dances do not work well if they are used with commonly typed letters.
- *  For example "A". Tap dances are best used on non-letter keys that are not hit while typing letters.
- *
- * Good places to put an advanced tap dance:
- *  z,q,x,j,k,v,b, any function key, home/end, comma, semi-colon
- *
- * Criteria for "good placement" of a tap dance key:
- *  Not a key that is hit frequently in a sentence
- *  Not a key that is used frequently to double tap, for example 'tab' is often double tapped in a terminal, or
- *    in a web form. So 'tab' would be a poor choice for a tap dance.
- *  Letters used in common words as a double. For example 'p' in 'pepper'. If a tap dance function existed on the
- *    letter 'p', the word 'pepper' would be quite frustating to type.
- *
- * For the third point, there does exist the 'DOUBLE_SINGLE_TAP', however this is not fully tested
- *
- */
-// To activate SINGLE_HOLD, you will need to hold for 200ms first.
-// This tap dance favors keys that are used frequently in typing like 'f'
-uint8_t cur_dance(qk_tap_dance_state_t *state) {
-    if (state->count == 1) {
-        if (state->interrupted || !state->pressed) return SINGLE_TAP;
-        // Key has not been interrupted, but the key is still held. Means you want to send a 'HOLD'.
-        else return SINGLE_HOLD;
-    } else if (state->count == 2) {
-        // DOUBLE_SINGLE_TAP is to distinguish between typing "pepper", and actually wanting a double tap
-        // action when hitting 'pp'. Suggested use case for this return value is when you want to send two
-        // keystrokes of the key, and not the 'double tap' action/macro.
-        if (state->interrupted) return DOUBLE_SINGLE_TAP;
-        else if (state->pressed) return DOUBLE_HOLD;
-        else return DOUBLE_TAP;
-    }
-
-    // Assumes no one is trying to type the same letter three times (at least not quickly).
-    // If your tap dance key is 'KC_W', and you want to type "www." quickly - then you will need to add
-    // an exception here to return a 'TRIPLE_SINGLE_TAP', and define that enum just like 'DOUBLE_SINGLE_TAP'
-    if (state->count == 3) {
-        if (state->interrupted || !state->pressed) return TRIPLE_TAP;
-        else return TRIPLE_HOLD;
-    } else return 8; // Magic number. At some point this method will expand to work for more presses
-}
-
-// Tap Dance definitions
-// Create an instance of 'tap' for each tap dance.
-// see QUAD FUNCTION FOR TAB in https://github.com/qmk/qmk_firmware/blob/master/users/gordon/gordon.c
-static tap copy_cut_paste_tap_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
-void copy_cut_paste_finished(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    copy_cut_paste_tap_state.state = cur_dance(state);
-    switch (copy_cut_paste_tap_state.state) {
-        case SINGLE_TAP: register_code16(LCMD(KC_C)); break;  // command-c: copy
-        case SINGLE_HOLD: register_code16(LCMD(KC_V)); break; // command-v: paste
-        case DOUBLE_TAP: register_code16(LCMD(KC_X)); break;  // command-x: cut
-        case DOUBLE_HOLD: register_code16(LCMD(KC_X)); break; // same as double-tap
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        case DOUBLE_SINGLE_TAP: tap_code16(LCMD(KC_X)); register_code16(LCMD(KC_X)); break; // same as double-tap
-    }
-}
-
-void copy_cut_paste_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // DOUBLE_HOLD and DOUBLE_SINGLE_TAP are placeholders
-    switch (copy_cut_paste_tap_state.state) {
-        case SINGLE_TAP: unregister_code16(LCMD(KC_C)); break;  // command-c: copy
-        case SINGLE_HOLD: unregister_code16(LCMD(KC_V)); break; // command-v: paste
-        case DOUBLE_TAP: unregister_code16(LCMD(KC_X)); break;  // command-x: cut
-        case DOUBLE_HOLD: unregister_code16(LCMD(KC_X)); break;        // same as double-tap
-        case DOUBLE_SINGLE_TAP: unregister_code16(LCMD(KC_X)); break;  // same as double-tap
-    }
-    copy_cut_paste_tap_state.state = 0;
-}
-
-qk_tap_dance_action_t tap_dance_actions[] = {
-    [COPY_CUT_PASTE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, copy_cut_paste_finished, copy_cut_paste_reset),
-    [UNDO_REDO] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_Z), SCMD(KC_Z)),
-    [FIND_REPLACE] = ACTION_TAP_DANCE_DOUBLE(LCMD(KC_F), LOPT(LCMD(KC_F))),
-};
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool check_diacritical = (
         (IS_LAYER_ON(_SAFE)) &&
@@ -510,7 +379,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     send_string(itoa(rgblight_get_val(), hsl_buffer, 10));
                     break;
                 case KC_BKTK_ESCAPE:  // One-key backtick/escape (see also key release)
-                    copy_paste_timer = timer_read();
+                    escape_timer = timer_read();
                     break;
                 case KC_UNICODE:
                     // on press: switch to UNICODE layer, depress option + leave it down
@@ -559,7 +428,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 case RGB_VAI:
                 case RGB_VAD: change_val = 0; rgb_done = true; break;
                 case KC_BKTK_ESCAPE:  // One key backtick/escape
-                    if (timer_elapsed(copy_paste_timer) > TAPPING_TERM) {  // Hold, escape
+                    if (timer_elapsed(escape_timer) > TAPPING_TERM) {  // Hold, escape
                         tap_code16(KC_ESCAPE);
                     } else { // Tap, backtick
                         tap_code16(KC_GRAVE);
