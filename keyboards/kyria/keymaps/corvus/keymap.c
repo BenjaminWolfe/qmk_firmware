@@ -230,24 +230,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *     Any other time it will just press tab.
  *     Command will be released when dropping out of the layer
  *     (see layer_state_set_kb below).
+ * Exclamation points are literally because I didn't like off-center words.
+ * Undo and redo are command-z and command-shift-z, respectively.
+ *    The pinky is just too weak and the z key too far away for something so important!
+ * Replace is the VS Code shortcut, command-option-F.
+ * Format is the VS Code shortcut, option-shift-F.
+ * Insert follows the VS Code Overtype extension, with command-shift-I.
+ *     https://marketplace.visualstudio.com/items?itemName=adammaras.overtype
+ *     It's frankly annoying that Mac doesn't use the insert key in general.
+ * Screenshot is the Mac shortcut to capture an area of the screen: command-shift-4.
+ * 1Password is command-shift-X to open the 1Password password prompt.
  * use CHROME and VSCODE layers to navigate between tabs
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
+ * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |Insert!|                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Esc   |       |Command| Shift |  Opt  | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |   Esc   |Scrnsht|Command| Shift |  Opt  | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |Control|Replace| Redo! | Undo! |Format!|       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |1Passwd|       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W), MO(VSCODE), MO(CHROME), _______,                                     _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         _______,    KC_LCMD,    KC_LSFT,    KC_LOPT,    KC_SWITCH,                                   _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______,        KC_LCTL,    _______,    _______,    _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                              _______,    _______,    _______, _______, _______, _______, _______, _______, _______, _______
+      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),        MO(VSCODE), MO(CHROME), SCMD(KC_I),                                       _______, _______, KC_UP,   _______, _______, _______,
+      KC_ESC,         SCMD(KC_4), KC_LCMD,           KC_LSFT,    KC_LOPT,    KC_SWITCH,                                        _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      _______,        KC_LCTL,    LCMD(LOPT(KC_F)),  SCMD(KC_Z), LCMD(KC_Z), LSA(KC_F), _______, _______, _______,    _______, _______, _______, _______, _______, _______, _______,
+                                                     _______,    _______,    _______,   _______, _______, SCMD(KC_X), _______, _______, _______, _______
     ),
  /*
   * Chrome

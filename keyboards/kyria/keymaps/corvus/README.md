@@ -1,7 +1,13 @@
+# Intro
+
+This keymap is for the Kyria split, column-staggered keyboard
+designed by Thomas Baart of https://www.splitkb.com.
+I use mine primarily on a Mac, so it's very much optimized for that,
+and use a lot of VS Code and Chrome in my work as a data scientist,
+so you'll see a lot of that in here as well.
+
 # Notes
 
-The Kyria is a split, column-staggered keyboard
-designed by Thomas Baart of https://www.splitkb.com.
 I use the Colemak keymap as my base: https://colemak.com.
 I chose to put most of my modifiers in the home row ("home-row modifiers").
 The specific HRM configurations I used were heavily influenced by this article:
@@ -126,13 +132,10 @@ I'm currently tinkering with new ways to handle undo-redo and find & replace.
 
 # Open Tasks and Ideas
 
-* Tinker with the keys mentioned in the last paragraph above.
-* Screenshot key, command-shift-4.
-* VS Code format key, option-shift-f.
+* Continue tinkering with the placement of shortcut keys.
 * Consider auto-shift; nothing wrong with using that _and_ the modifier key.
 * Consider using aliases for keys as outlined in the home row modifiers article.
   It certainly makes the code easier to read.
-* Command-shift-x for 1Password?
 * More intentional arrangement of RGB, media, and function keys.
 * Reduce file size to be able to use the leader key functionality.
 * Add emoji support, in some way?
