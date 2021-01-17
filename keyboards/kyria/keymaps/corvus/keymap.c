@@ -44,8 +44,7 @@ char hsl_buffer[3];
 // TODO: Make the layers match the enum.
 enum layers {
     COLEMAK = 0,
-    _SWITCH,
-    _SAFE,
+    _HOLD,
     NUMPAD,
     UNICODE,
     SYMBOLS,
@@ -72,101 +71,78 @@ enum custom_keycodes {
 // and `layer_state_set_user` and `render_status` below
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
- * Base Layer: COLEMAK
+ * Base Layer: COLEMAK DH(m)
  * Line 2 of each key is what you get when you hold it.
  * Layer names are distinguished by CAPS.
- * The control-option-shift-symbols order allows easy access to a shifted top row,
- *   and it also works well with the NAV layer.
- *   In the NAV layer, control-option-shift-command allows easy combos
- *   of either command-shift or option-shift for editing.
+ * Duplicating option allows for option-shift combinations.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * | Backtck |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
+ * | Backtck |   Q   |   W   |   F   |   P   |   B   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |Caps Lock|   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
- * | _SWITCH | _SAFE |  Opt  | Shift |SYMBOLS|       |                                  |       |SYMBOLS| Shift |  Opt  | _SAFE | _SWITCH |
+ * |Caps Lock|   A   |   R   |   S   |   T   |   G   |                                  |   M   |   N   |   E   |   I   |   O   |   ' "   |
+ * |         | HOLD  |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |  Enter  |
- * |         |Control|       |       |       |       |       |       |  |       |       |       |       |       |       |Control|         |
+ * |         |   Z   |   X   |   C   |   D   |   V   |       |       |  |       |       |   K   |   H   |  , <  |  . >  |  / ?  |  Enter  |
+ * | Control |       |       |       |       |       |       |       |  |       |  Opt  |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |Backspc|  Del  |  |  Tab  | Space |       |       |       |
- *                           |       |       | NUMPD |Command|  NAV  |  | ADJST |       |       |       |       |
+ *                           |       |       | NUMPD |Command|  NAV  |  | ADJST | Shift |  Opt  |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE,       KC_Q,            KC_W,         KC_F,         KC_P,              KC_G,                                                                       KC_J,    KC_L,              KC_U,         KC_Y,         KC_SCLN,         KC_MINS,
-      LT(_SWITCH, KC_CAPS), LT(_SAFE, KC_A), LOPT_T(KC_R), LSFT_T(KC_S), LT(SYMBOLS, KC_T), KC_D,                                                                       KC_H,    LT(SYMBOLS, KC_N), RSFT_T(KC_E), ROPT_T(KC_I), LT(_SAFE, KC_O), LT(_SWITCH, KC_QUOT),
-      _______,              LCTL_T(KC_Z),    KC_X,         KC_C,         KC_V,              KC_B,       _______,         _______,          _______,            _______, KC_K,    KC_M,              KC_COMM,      KC_DOT,       RCTL_T(KC_SLSH), KC_ENTER,
-                                                           _______,      _______,           MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_DEL),  LT(ADJUST, KC_TAB), KC_SPC,  _______, _______,           _______
+      KC_BKTK_ESCAPE, KC_Q,            KC_W,    KC_F,    KC_P,    KC_B,                                                                               KC_J,    KC_L,    KC_U,    KC_Y,   KC_SCLN, KC_MINS,
+      KC_CAPS,        LT(_HOLD, KC_A), KC_R,    KC_S,    KC_T,    KC_G,                                                                               KC_M,    KC_N,    KC_E,    KC_I,   KC_O,    KC_QUOT,
+      KC_LCTL,        KC_Z,            KC_X,    KC_C,    KC_D,    KC_V,       KC_LSFT,         _______,          _______,            KC_LOPT,         KC_K,    KC_H,    KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
+                                                _______, _______, MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_DEL),  LT(ADJUST, KC_TAB), LSFT_T(KC_SPC),  KC_LOPT, _______, _______
     ),
 /*
- * SWITCH
+ * Hold
+ * Allows continuous holding of backspace, space, and delete;
+ * puts space on the left hand for when I'm holding the mouse.
+ * Tab and shift tab are also on the left hand.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         | _SAFE |       |       |SYMBOLS|       |                                  |       |SYMBOLS|       |       | _SAFE |         |
+ * |         |       |       |       |  Tab  |ShftTab|                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | NUMPD |       |  NAV  |  | ADJST |       |       |       |       |
+ *                           |       |       | Space |Backspc|  Del  |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
-    [_SWITCH] = LAYOUT(
-      _______, _______, _______, _______, _______,     _______,                                           _______, _______,     _______, _______, _______, _______,
-      _______, _______, _______, _______, TG(SYMBOLS), _______,                                           _______, TG(SYMBOLS), _______, _______, _______, _______,
-      _______, _______, _______, _______, _______,     _______,    _______, _______, _______,    _______, _______, _______,     _______, _______, _______, _______,
-                                 _______, _______,     TG(NUMPAD), _______, TG(NAV), TG(ADJUST), _______, _______, _______,     _______
+    [_HOLD] = LAYOUT(
+      _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, KC_TAB,  S(KC_TAB),                                   _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                 _______, _______, KC_SPC,  KC_BSPC, KC_DEL,  _______, _______, _______, _______, _______
     ),
 /*
- * Safe Layer: no mod-tap keys
- * This way you can take advantage of special MacOS tap-and-hold keys:
- * `luy` (top row, RH), `asneio` (home row), and `zc` (bottom row, LH).
- *
- * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |   Q   |   W   |   F   |   P   |   G   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
- * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
- * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |   A   |   R   |   S   |   T   |   D   |                                  |   H   |   N   |   E   |   I   |   O   |   ' "   |
- * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |   Z   |   X   |   C   |   V   |   B   |       |       |  |       |       |   K   |   M   |  , <  |  . >  |  / ?  |         |
- * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
- * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |Backspc|  Del  |  |  Tab  |       |       |       |       |
- *                           |       |       |       |       |       |  |       |       |       |       |       |
- *                           `---------------------------------------'  `---------------------------------------'
- */
-    [_SAFE] = LAYOUT(
-      _______, KC_Q, KC_W, KC_F,    KC_P,    KC_G,                                        KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_MINS,
-      _______, KC_A, KC_R, KC_S,    KC_T,    KC_D,                                        KC_H,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-      _______, KC_Z, KC_X, KC_C,    KC_V,    KC_B,    _______, _______, _______, _______, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, _______,
-                           _______, _______, _______, KC_BSPC, KC_DEL,  KC_TAB,  _______, _______, _______, _______
-    ),
-/*
- * Modified Number Pad
+ * Modified Number Pad with Selected Symbols
  * intended primarily for *entering numerical values*
- * all symbols can be found in familiar locations on the SYMBOLS layer
- * KC_KP_MINUS doesn't even allow for en- and em-dash but that's acceptable for numbers
- * Added a dedicated tab here.
- *   It's common to tab after numbers, for example when autocompleting git branch names.
+ * most symbols can be found in familiar locations on the SYMBOLS layer
+ * some that are particularly common for coding are conveniently arranged on the left
+ * in particular, =/+ if not left in the traditional location
+ *   because it gets awfully confusing to have it on the same key with -/_
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |   =   |   7   |   8   |   9   |   /   |         |
+ * |         |   /   |   +   |   [   |   ]   |       |                                  |       |   7   |   8   |   9   |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |UNICODE|  Tab  |                                  |   +   |   4   |   5   |   6   |   *   |         |
+ * |         |   |   |   =   |   (   |   )   |       |                                  |       |   4   |   5   |   6   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |   (   |   1   |   2   |   3   |   )   |         |
+ * | UNICODE |   \   |   -   |   {   |   }   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |   -   |   0   |   .   |   ,   |       |
+ *                           |       |       |       |       |       |  |       |   0   |       |       |       |
+ *                           |       |       |       |       |       |  |       |SYMBOLS|       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMPAD] = LAYOUT(
-      _______, _______, _______, _______, _______,    _______,                                         KC_KP_EQUAL, KC_KP_7,     KC_KP_8, KC_KP_9, KC_KP_SLASH,    _______,
-      _______, _______, _______, _______, KC_UNICODE, KC_TAB,                                          KC_KP_PLUS,  KC_KP_4,     KC_KP_5, KC_KP_6, KC_KP_ASTERISK, _______,
-      _______, _______, _______, _______, _______,    _______, _______, _______, _______,     _______, KC_LPRN,     KC_KP_1,     KC_KP_2, KC_KP_3, KC_RIGHT_PAREN, _______,
-                                 _______, _______,    _______, _______, _______, KC_KP_MINUS, KC_KP_0, KC_KP_DOT,   KC_KP_COMMA, _______
+      _______,    KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, _______,                                                  _______, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
+      _______,    S(KC_BSPC), KC_KP_EQUAL, KC_LPRN, KC_RPRN, _______,                                                  _______, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______,
+      KC_UNICODE, KC_BSPC,    KC_KP_MINUS, KC_LCBR, KC_RCBR, _______, _______, _______, _______, _______,              _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
+                                           _______, _______, _______, _______, _______, _______, LT(SYMBOLS, KC_KP_0), _______, _______, _______
     ),
 /*
  * Unicode Pad
@@ -176,51 +152,46 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * "Toggle inputs" to switch back to the one you were just on.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   |   D   |         |
+ * |         |       |       |       |       |       |                                  |   A   |       |       |       |   D   |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |                                  |   B   |   4   |   5   |   6   |   E   |         |
+ * |         |       |       |       |       |       |                                  |   B   |       |       |       |   E   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   |   F   |         |
+ * |         |       |       |       |       |       |       |       |  |       |       |   C   |       |       |       |   F   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  | Cycle |   0   | Toggl |       |       |
+ *                           |       |       |       |       |       |  | Cycle |       | Toggl |       |       |
  *                           |       |       |       |       |       |  | Inpts |       | Inpts |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [UNICODE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                             KC_A,             KC_KP_7, KC_KP_8, KC_KP_9, KC_D, _______,
-      _______, _______, _______, _______, _______, _______,                                             KC_B,             KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______,         _______, KC_C,             KC_KP_1, KC_KP_2, KC_KP_3, KC_F, _______,
-                                 _______, _______, _______, _______, _______, KC_CYCLE_INPUTS, KC_KP_0, KC_TOGGLE_INPUTS, _______, _______
+      _______, _______, _______, _______, _______, _______,                                             KC_A,             _______, _______, _______, KC_D, _______,
+      _______, _______, _______, _______, _______, _______,                                             KC_B,             _______, _______, _______, KC_E, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______,         _______, KC_C,             _______, _______, _______, KC_F, _______,
+                                 _______, _______, _______, _______, _______, KC_CYCLE_INPUTS, _______, KC_TOGGLE_INPUTS, _______, _______
     ),
  /*
-  * Numbers and Symbols (traditional top row)
-  * Shows numbers and symbols in a modified top-row pattern, for password muscle memory and such
-  * Pinky gets plus and equal sign because hyphen/underscore are already on the default layer.
-  * Brackets, curly braces, backslashes and pipes are added bc they deserve easy access!
-  *   Brackets and curly braces are right under parentheses.
-  *   Backslash and pipe are where forward slash lives on the default layer.
-  *   The keys over the "shift" and "top row" modifiers are left open (transparent).
-  * Also on this layer are reversed versions of the thumb keys
-  *   (space, delete, backspace, and tab),
-  *   largely so they're all avalailable from the left hand
-  *   when my right hand in on the mouse.
+  * Symbols
+  * Places symbols in a modified top-row pattern
+  * intended as a sort of shift mode for the numpad layer
+  * backtick is common enough in markdown to get prime real estate of its own
+  * also I should not have to drop out of number mode for period and comma,
+  *   so they are added in the normal position
   *
   * ,-------------------------------------------------.                                  ,-------------------------------------------------.
-  * |   ` ~   |  1 !  |  2 @  |  3 #  |  4 $  |  5 %  |                                  |  6 ^  |  7 &  |  8 *  |  9 (  |  0 )  |   = +   |
+  * |    ~    |   !   |   @   |   #   |   $   |   %   |                                  |   ^   |   &   |   *   |   (   |   )   |         |
   * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |                                  |       |       |       |  [ {  |  ] }  |         |
+  * |         |       |       |       |   `   |       |                                  |       |       |       |       |       |         |
   * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |  \ |  |         |
+  * |         |       |       |       |       |       |       |       |  |       |       |       |       |   ,   |   .   |       |         |
   * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       | Space |  Tab  |  |  Del  |Backspc|       |       |       |
-  *                           |       |       |       |Command|  NAV  |  | ADJST |       |       |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
+  *                           |       |       |       |       |       |  |       |       |       |       |       |
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [SYMBOLS] = LAYOUT(
-       KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                                                  KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQUAL,
-       _______, _______, _______, _______, _______, _______,                                                               _______, _______, _______, KC_LBRC, KC_RBRC, _______,
-       _______, _______, _______, _______, _______, _______, _______,        _______,         _______,            _______, _______, _______, _______, _______, KC_BSLS, _______,
-                                  _______, _______, _______, LCMD_T(KC_SPC), LT(NAV, KC_TAB), LT(ADJUST, KC_DEL), KC_BSPC, _______, _______, _______
+       KC_TILD,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR,   KC_LPRN,     KC_RPRN, _______,
+       _______,  _______, _______, _______, KC_GRV,  _______,                                     _______, _______, _______,   _______,     _______, _______,
+       _______,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_KP_DOT, KC_KP_COMMA, _______, _______,
+                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
      ),
 /*
  * Navigation Layer
@@ -230,10 +201,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *     Any other time it will just press tab.
  *     Command will be released when dropping out of the layer
  *     (see layer_state_set_kb below).
- * Exclamation points are literally because I didn't like off-center words.
  * Undo and redo are command-z and command-shift-z, respectively.
- *    The pinky is just too weak and the z key too far away for something so important!
- * Replace is the VS Code shortcut, command-option-F.
  * Format is the VS Code shortcut, option-shift-F.
  * Insert follows the VS Code Overtype extension, with command-shift-I.
  *     https://marketplace.visualstudio.com/items?itemName=adammaras.overtype
@@ -243,21 +211,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * use CHROME and VSCODE layers to navigate between tabs
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |Insert!|                                  |       |       |   ↑   |       |       |         |
+ * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Esc   |Scrnsht|Command| Shift |  Opt  | Swtch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |   Esc   |Scrnsht|Command| Shift |  Opt  |Switch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |Control|Replace| Redo! | Undo! |Format!|       |       |  |       |       |       |       |       |       |       |         |
+ * |  Redo   | Undo  |  Cut  | Copy  | Paste |Format |Insert |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |1Passwd|       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W),        MO(VSCODE), MO(CHROME), SCMD(KC_I),                                       _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         SCMD(KC_4), KC_LCMD,           KC_LSFT,    KC_LOPT,    KC_SWITCH,                                        _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      _______,        KC_LCTL,    LCMD(LOPT(KC_F)),  SCMD(KC_Z), LCMD(KC_Z), LSA(KC_F), _______, _______, _______,    _______, _______, _______, _______, _______, _______, _______,
-                                                     _______,    _______,    _______,   _______, _______, SCMD(KC_X), _______, _______, _______, _______
+      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W), MO(VSCODE), MO(CHROME), _______,                                             _______, _______, KC_UP,   _______, _______, _______,
+      KC_ESC,         SCMD(KC_4), KC_LCMD,    KC_LSFT,    KC_LOPT,    KC_SWITCH,                                           _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      SCMD(KC_Z),     LCMD(KC_Z), LCMD(KC_X), LCMD(KC_C), LCMD(KC_V), LSA(KC_F), SCMD(KC_I), _______, _______,    _______, _______, _______, _______, _______, _______, _______,
+                                              _______,    _______,    _______,   _______,    _______, SCMD(KC_X), _______, _______, _______, _______
     ),
  /*
   * Chrome
@@ -346,127 +314,91 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    bool check_diacritical = (
-        (IS_LAYER_ON(_SAFE)) &&
-        (
-            (keycode == KC_L) ||
-            (keycode == KC_U) ||
-            (keycode == KC_Y) ||
-            (keycode == KC_A) ||
-            (keycode == KC_S) ||
-            (keycode == KC_N) ||
-            (keycode == KC_E) ||
-            (keycode == KC_I) ||
-            (keycode == KC_O) ||
-            (keycode == KC_Z) ||
-            (keycode == KC_C)
-        )
-    );
     if (record->event.pressed) {
         // on press...
-        if (check_diacritical) {
-            diacritical_mark_timer = timer_read();
-            need_diacritical = true;
-        } else {
-            switch (keycode) {
-                // rgb keys; see also key-release code below
-                case RGB_HUI: change_timer = timer_read(); change_hue =  1; return false;
-                case RGB_HUD: change_timer = timer_read(); change_hue = -1; return false;
-                case RGB_SAI: change_timer = timer_read(); change_sat =  1; return false;
-                case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
-                case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
-                case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
-                case RGB_RST:
-                    rgblight_sethsv(HSV_DEFAULT);
-                    break;
-                case RGB_HUG:
-                    send_string(itoa(rgblight_get_hue(), hsl_buffer, 10));
-                    break;
-                case RGB_SAG:
-                    send_string(itoa(rgblight_get_sat(), hsl_buffer, 10));
-                    break;
-                case RGB_VAG:
-                    send_string(itoa(rgblight_get_val(), hsl_buffer, 10));
-                    break;
-                case KC_BKTK_ESCAPE:  // One-key backtick/escape (see also key release)
-                    escape_timer = timer_read();
-                    break;
-                case KC_UNICODE:
-                    // on press: switch to UNICODE layer, depress option + leave it down
-                    // see also key release
-                    layer_on(UNICODE);
-                    SEND_STRING(SS_DOWN(X_LOPT));
-                    break;
-                case KC_CYCLE_INPUTS:
-                    // on press: control-option-space
-                    // only accessed from UNICODE layer, where option is already depressed
-                    // then option key up and down to reset for unicode keystrokes
-                    SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
-                    break;
-                case KC_TOGGLE_INPUTS:
-                    // on press: control-space
-                    // only accessed from UNICODE layer, where option is already depressed
-                    SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
-                    break;
-                case KC_SWITCH:
-                    // on press: depress command if not already depressed; tap tab
-                    // command is released when switching back to default layer
-                    if (!command_tracker) {
-                        register_code(KC_LCMD);
-                        command_tracker = true;
-                    }
-                    tap_code(KC_TAB);
-                    break;
-            }
+        switch (keycode) {
+            // rgb keys; see also key-release code below
+            case RGB_HUI: change_timer = timer_read(); change_hue =  1; return false;
+            case RGB_HUD: change_timer = timer_read(); change_hue = -1; return false;
+            case RGB_SAI: change_timer = timer_read(); change_sat =  1; return false;
+            case RGB_SAD: change_timer = timer_read(); change_sat = -1; return false;
+            case RGB_VAI: change_timer = timer_read(); change_val =  1; return false;
+            case RGB_VAD: change_timer = timer_read(); change_val = -1; return false;
+            case RGB_RST:
+                rgblight_sethsv(HSV_DEFAULT);
+                break;
+            case RGB_HUG:
+                send_string(itoa(rgblight_get_hue(), hsl_buffer, 10));
+                break;
+            case RGB_SAG:
+                send_string(itoa(rgblight_get_sat(), hsl_buffer, 10));
+                break;
+            case RGB_VAG:
+                send_string(itoa(rgblight_get_val(), hsl_buffer, 10));
+                break;
+            case KC_BKTK_ESCAPE:  // One-key backtick/escape (see also key release)
+                escape_timer = timer_read();
+                break;
+            case KC_UNICODE:
+                // on press: switch to UNICODE layer, depress option + leave it down
+                // see also key release
+                layer_on(UNICODE);
+                SEND_STRING(SS_DOWN(X_LOPT));
+                break;
+            case KC_CYCLE_INPUTS:
+                // on press: control-option-space
+                // only accessed from UNICODE layer, where option is already depressed
+                // then option key up and down to reset for unicode keystrokes
+                SEND_STRING(SS_LCTL(" ") SS_UP(X_LOPT) SS_DOWN(X_LOPT));
+                break;
+            case KC_TOGGLE_INPUTS:
+                // on press: control-space
+                // only accessed from UNICODE layer, where option is already depressed
+                SEND_STRING(SS_UP(X_LOPT) SS_LCTL(" ") SS_DOWN(X_LOPT));
+                break;
+            case KC_SWITCH:
+                // on press: depress command if not already depressed; tap tab
+                // command is released when switching back to default layer
+                if (!command_tracker) {
+                    register_code(KC_LCMD);
+                    command_tracker = true;
+                }
+                tap_code(KC_TAB);
+                break;
         }
     } else {
         // on release...
-        if (check_diacritical) {
-            if (turn_off_symbols) {
-                turn_off_symbols = false;
-                layer_off(SYMBOLS);
-            } else {
-                need_diacritical = false;
-            }
-        } else {
-            bool rgb_done = false;
-            switch (keycode) {
-                case RGB_HUI:
-                case RGB_HUD: change_hue = 0; rgb_done = true; break;
-                case RGB_SAI:
-                case RGB_SAD: change_sat = 0; rgb_done = true; break;
-                case RGB_VAI:
-                case RGB_VAD: change_val = 0; rgb_done = true; break;
-                case KC_BKTK_ESCAPE:  // One key backtick/escape
-                    if (timer_elapsed(escape_timer) > TAPPING_TERM) {  // Hold, escape
-                        tap_code16(KC_ESCAPE);
-                    } else { // Tap, backtick
-                        tap_code16(KC_GRAVE);
-                    }
-                    break;
-                case KC_UNICODE:
-                    // on release: release option and deactivate UNICODE layer
-                    SEND_STRING(SS_UP(X_LOPT));
-                    layer_off(UNICODE);
-                    break;
-            }
-            if (rgb_done) {
-                HSV final = rgblight_get_hsv();
-                rgblight_sethsv(final.h, final.s, final.v);
-            }
+        bool rgb_done = false;
+        switch (keycode) {
+            case RGB_HUI:
+            case RGB_HUD: change_hue = 0; rgb_done = true; break;
+            case RGB_SAI:
+            case RGB_SAD: change_sat = 0; rgb_done = true; break;
+            case RGB_VAI:
+            case RGB_VAD: change_val = 0; rgb_done = true; break;
+            case KC_BKTK_ESCAPE:  // One key backtick/escape
+                if (timer_elapsed(escape_timer) > TAPPING_TERM) {  // Hold, escape
+                    tap_code16(KC_ESCAPE);
+                } else { // Tap, backtick
+                    tap_code16(KC_GRAVE);
+                }
+                break;
+            case KC_UNICODE:
+                // on release: release option and deactivate UNICODE layer
+                SEND_STRING(SS_UP(X_LOPT));
+                layer_off(UNICODE);
+                break;
+        }
+        if (rgb_done) {
+            HSV final = rgblight_get_hsv();
+            rgblight_sethsv(final.h, final.s, final.v);
         }
     }
     return true;
 }
 
 void matrix_scan_user(void) {
-    if (need_diacritical) {
-        if (timer_elapsed(diacritical_mark_timer) > 1000) {
-            layer_on(SYMBOLS);
-            need_diacritical = false;
-            turn_off_symbols = true;
-        }
-    } else if (change_hue != 0 || change_val != 0 || change_sat != 0) {
+    if (change_hue != 0 || change_val != 0 || change_sat != 0) {
         if (timer_elapsed(change_timer) > change_tick) {
             HSV hsv = rgblight_get_hsv();
             hsv.h += change_hue;
@@ -573,11 +505,8 @@ static void render_status(void) {
         case COLEMAK:
             oled_write_P(PSTR("Colemak\n"), false);
             break;
-        case _SWITCH:
-            oled_write_P(PSTR("Switch\n"), false);
-            break;
-        case _SAFE:
-            oled_write_P(PSTR("Safety\n"), false);
+        case _HOLD:
+            oled_write_P(PSTR("Hold\n"), false);
             break;
         case NUMPAD:
             oled_write_P(PSTR("Numpad\n"), false);
