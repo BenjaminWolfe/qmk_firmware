@@ -72,52 +72,59 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: COLEMAK DH(m)
  * Line 2 of each key is what you get when you hold it.
  * Layer names are distinguished by CAPS.
- * Duplicating option allows for option-shift combinations.
+ * Duplicating option and command allows for -shift combinations.
+ * I'm experimenting with putting NUMBERS on the pinkies;
+ *   it was originally between shift and unicode.
+ *   I'm finding that I really prefer to use a modifier on the opposite hand
+ *     from the key I'm targeting.
+ *   If this works well I might be able to shift zero back to the thumb,
+ *     and I might switch UNICODE and ADJST, by the "hand-switching" logic.
+ *   Currently I'm worried about the apostrophe working correctly in everyday use.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   B   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
  * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   A   |   R   |   S   |   T   |   G   |                                  |   M   |   N   |   E   |   I   |   O   |   ' "   |
- * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * | NUMBERS |       |       |       |       |       |                                  |       |       |       |       |       | NUMBERS |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |   Z   |   X   |   C   |   D   |   V   |       |       |  |       |       |   K   |   H   |  , <  |  . >  |  / ?  |  Enter  |
  * | Control |       |       |       |       |       |Command|       |  |       |  Opt  |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |Backspc|  Del  |  |  Tab  | Space |       |       |       |
- *                           |       | ADJST |  NAV  | Shift |Command|  |  Opt  | Shift |NUMBERS|UNICODE|       |
+ *                           |       | ADJST |  NAV  | Shift |Command|  |  Opt  | Shift |       |UNICODE|       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, KC_Q,    KC_W,    KC_F,    KC_P,       KC_B,                                                                       KC_J,        KC_L,       KC_U,    KC_Y,   KC_SCLN, KC_MINS,
-      KC_CAPS,        KC_A,    KC_R,    KC_S,    KC_T,       KC_G,                                                                       KC_M,        KC_N,       KC_E,    KC_I,   KC_O,    KC_QUOT,
-      KC_LCTL,        KC_Z,    KC_X,    KC_C,    KC_D,       KC_V,    KC_LCMD,         _______,         _______,        KC_LOPT,         KC_K,        KC_H,       KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
-                                        _______, MO(ADJUST), MO(NAV), LSFT_T(KC_BSPC), LCMD_T(KC_DEL),  LOPT_T(KC_TAB), LSFT_T(KC_SPC),  MO(NUMBERS), KC_UNICODE, _______
+      KC_BKTK_ESCAPE,       KC_Q,    KC_W,    KC_F,    KC_P,       KC_B,                                                                       KC_J,    KC_L,       KC_U,    KC_Y,   KC_SCLN, KC_MINS,
+      LT(NUMBERS, KC_CAPS), KC_A,    KC_R,    KC_S,    KC_T,       KC_G,                                                                       KC_M,    KC_N,       KC_E,    KC_I,   KC_O,    LT(NUMBERS, KC_QUOT),
+      KC_LCTL,              KC_Z,    KC_X,    KC_C,    KC_D,       KC_V,    KC_LCMD,         _______,         _______,        KC_LOPT,         KC_K,    KC_H,       KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
+                                              _______, MO(ADJUST), MO(NAV), LSFT_T(KC_BSPC), LCMD_T(KC_DEL),  LOPT_T(KC_TAB), LSFT_T(KC_SPC),  _______, KC_UNICODE, _______
     ),
 /*
  * Numbers and Symbols
  * number placement mimics that of the traditional number pad
  * some symbols follow a novel logic that makes sense to me
- * the rest follow follow the 1-8 order of the traditional number row
- *   these are noted here by tripling them
- *   I may decide to change these later;
- *     in particular I'd like backtick to be easier to get to for markdown!
+ *   even dollar and carat are paired for regular expressions,
+ *     though it may make more sense to put the carat on top.
+ * some symbols are moved to the NAV layer to make them easier to type.
+ * I really tried to avoid the in-and-down index stretch, which I find unnatural.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |   /   |   +   |   [   |   ]   |  ###  |                                  |  ^^^  |   7   |   8   |   9   |  ***  |         |
+ * |         |   /   |   +   |   [   |   ]   |   $   |                                  |   %   |   7   |   8   |   9   |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |   |   |   =   |   (   |   )   |  @@@  |                                  |  %%%  |   4   |   5   |   6   |   0   |         |
+ * |         |   |   |   =   |   (   |   )   |   ^   |                                  |   &   |   4   |   5   |   6   |   0   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |   \   |   -   |   {   |   }   |  !!!  |       |       |  |       |       |  $$$  |   1   |   2   |   3   |  &&&  |         |
+ * |         |   \   |   -   |   {   |   }   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMBERS] = LAYOUT(
-      _______, KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, KC_HASH,                                     KC_CIRC, KC_KP_7, KC_KP_8, KC_KP_9, KC_ASTR, _______,
-      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_AT,                                       KC_PERC, KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0, _______,
-      _______, KC_BSLS,    KC_KP_MINUS, KC_LCBR, KC_RCBR, KC_EXLM, _______, _______, _______, _______, KC_DLR,  KC_KP_1, KC_KP_2, KC_KP_3, KC_AMPR, _______,
+      _______, KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, KC_DLR,                                      KC_PERC, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
+      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_CIRC,                                     KC_AMPR, KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0, _______,
+      _______, KC_BSLS,    KC_KP_MINUS, KC_LCBR, KC_RCBR, _______, _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
                                         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
 /*
@@ -151,7 +158,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Navigation Layer
  * intended for tab navigation and text selection/manipulation.
  * arrow keys are positioned on the right hand mimicking the traditional placement.
- *   page up and down are not much used on a Mac, or even home and end for that matter.
+ *   page up and down are not much used on a Mac, or even home and end for that matter,
+ *     but I include them for when I most likely eventually have to switch for work.
  *   use CHROME and VSCODE layers with the arrows to navigate between tabs
  *   1Password is command-shift-X to open the 1Password password prompt.
  * command, shift, and option are placed conveniently in the home row on the left hand.
@@ -159,36 +167,41 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *   backtick, q, and w are particularly important on a mac.
  *   p, pressed with shift, is useful in VS code.
  * KC_SWITCH is for switching tabs on a Mac.
- *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
- *     Any other time it will just press tab.
- *     Command will be released when dropping out of the layer
- *     (see layer_state_set_kb below).
+ *   When pressed the first time, it depresses command and leaves it down, and then taps tab.
+ *   Any other time it will just press tab.
+ *   Command will be released when dropping out of the layer
+ *   (see layer_state_set_kb below).
  * the bottom row on the left is a modified version of the traditional Cmd-ZXCV pattern.
- * Cmd-V (for now?) is left in the non-DHm position.
- * Undo and redo are command-z and command-shift-z, respectively.
- * Format is the VS Code shortcut, option-shift-F.
- * Insert follows the VS Code Overtype extension, with command-shift-I.
- *     https://marketplace.visualstudio.com/items?itemName=adammaras.overtype
- *     It's frankly annoying that Mac doesn't use the insert key in general.
- * Screenshot is the Mac shortcut to capture an area of the screen: command-shift-4.
- * Escape is left close to its position in the default layer.
+ *   Cmd-V (for now?) is left in the non-DHm position.
+ *   Undo and redo are command-z and command-shift-z, respectively.
+ *   Format is the VS Code shortcut, option-shift-F.
+ *   Insert follows the VS Code Overtype extension, with command-shift-I.
+ *       https://marketplace.visualstudio.com/items?itemName=adammaras.overtype
+ *       It's frankly annoying that Mac doesn't use the insert key in general.
+ *   Screenshot is the Mac shortcut to capture an area of the screen: command-shift-4.
+ *   Escape is left close to its position in the default layer.
+ * on the right are also some of the most common symbols, shift 1, 2, 8, and 3.
+ *   using a keyboard like the Kyria really spoils you, and you notice key placement.
+ *   I didn't want a key as important as the asterisk on the pinky's bottom row.
+ *   and I didn't want any of these keys relegated to where they would have been
+ *     in the numbers layer.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |Cmd-Bactc| Cmd-Q | Cmd-W | Cmd-F | Cmd-P | Cmd-B |                                  |       |       |   ↑   |       |       |         |
+ * |Cmd-Bactc| Cmd-Q | Cmd-W | Cmd-F | Cmd-P | Cmd-B |                                  |       | Home  |   ↑   |  End  | PgUp  |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |   Esc   |Scrnsht|Command| Shift |  Opt  |Switch |                                  |       |   ←   |   ↓   |   →   |       |         |
+ * |   Esc   |Scrnsht|Command| Shift |  Opt  |Switch |                                  |       |   ←   |   ↓   |   →   | PgDn  |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |  Redo   | Undo  |  Cut  | Copy  | Paste |Format |Insert |       |  |       |       |       |       |       |       |       |         |
+ * |  Redo   | Undo  |  Cut  | Copy  | Paste |Format |Insert |       |  |       |       |       |   !   |   @   |   *   |   #   |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |1Passwd|       |       |       |       |
  *                           |       |       |       |       |       |  |       |CHROME |VSCODE |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      G(KC_GRAVE), G(KC_Q),    G(KC_W), G(KC_F), G(KC_P), G(KC_B),                                                _______,    _______, KC_UP,   _______, _______, _______,
-      KC_ESC,      SCMD(KC_4), KC_LCMD, KC_LSFT, KC_LOPT, KC_SWITCH,                                              _______,    KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      SCMD(KC_Z),  G(KC_Z),    G(KC_X), G(KC_C), G(KC_V), LSA(KC_F), SCMD(KC_I), _______, _______,    _______,    _______,    _______, _______, _______, _______, _______,
-                                        _______, _______,   _______, _______,    _______, SCMD(KC_X), MO(CHROME), MO(VSCODE), _______, _______
+      G(KC_GRAVE), G(KC_Q),    G(KC_W), G(KC_F), G(KC_P), G(KC_B),                                                _______,    KC_HOME, KC_UP,   KC_END,  KC_PGUP,   _______,
+      KC_ESC,      SCMD(KC_4), KC_LCMD, KC_LSFT, KC_LOPT, KC_SWITCH,                                              _______,    KC_LEFT, KC_DOWN, KC_RGHT, KC_PGDOWN, _______,
+      SCMD(KC_Z),  G(KC_Z),    G(KC_X), G(KC_C), G(KC_V), LSA(KC_F), SCMD(KC_I), _______, _______,    _______,    _______,    KC_EXLM, KC_AT,   KC_ASTR, KC_HASH,   _______,
+                                        _______, _______, _______,   _______,    _______, SCMD(KC_X), MO(CHROME), MO(VSCODE), _______, _______
     ),
  /*
   * Chrome
