@@ -77,9 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *   it was originally between shift and unicode.
  *   I'm finding that I really prefer to use a modifier on the opposite hand
  *     from the key I'm targeting.
- *   If this works well I might be able to shift zero back to the thumb,
- *     and I might switch UNICODE and ADJST, by the "hand-switching" logic.
- *   Currently I'm worried about the apostrophe working correctly in everyday use.
+ *   I'm still testing to see if the apostrophe causes a lot of misfires for me.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * | Backtck |   Q   |   W   |   F   |   P   |   B   |                                  |   J   |   L   |   U   |   Y   |  ; :  |   - _   |
@@ -92,14 +90,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * | Control |       |       |       |       |       |Command|       |  |       |  Opt  |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |Backspc|  Del  |  |  Tab  | Space |       |       |       |
- *                           |       | ADJST |  NAV  | Shift |Command|  |  Opt  | Shift |       |UNICODE|       |
+ *                           |       |UNICODE|  NAV  | Shift |Command|  |  Opt  | Shift |       | ADJST |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
       KC_BKTK_ESCAPE,       KC_Q,    KC_W,    KC_F,    KC_P,       KC_B,                                                                       KC_J,    KC_L,       KC_U,    KC_Y,   KC_SCLN, KC_MINS,
       LT(NUMBERS, KC_CAPS), KC_A,    KC_R,    KC_S,    KC_T,       KC_G,                                                                       KC_M,    KC_N,       KC_E,    KC_I,   KC_O,    LT(NUMBERS, KC_QUOT),
       KC_LCTL,              KC_Z,    KC_X,    KC_C,    KC_D,       KC_V,    KC_LCMD,         _______,         _______,        KC_LOPT,         KC_K,    KC_H,       KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
-                                              _______, MO(ADJUST), MO(NAV), LSFT_T(KC_BSPC), LCMD_T(KC_DEL),  LOPT_T(KC_TAB), LSFT_T(KC_SPC),  _______, KC_UNICODE, _______
+                                              _______, KC_UNICODE, MO(NAV), LSFT_T(KC_BSPC), LCMD_T(KC_DEL),  LOPT_T(KC_TAB), LSFT_T(KC_SPC),  _______, MO(ADJUST), _______
     ),
 /*
  * Numbers and Symbols
@@ -113,19 +111,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
  * |         |   /   |   +   |   [   |   ]   |   $   |                                  |   %   |   7   |   8   |   9   |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |   |   |   =   |   (   |   )   |   ^   |                                  |   &   |   4   |   5   |   6   |   0   |         |
+ * |         |   |   |   =   |   (   |   )   |   ^   |                                  |   &   |   4   |   5   |   6   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |   \   |   -   |   {   |   }   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |   0   |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMBERS] = LAYOUT(
       _______, KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, KC_DLR,                                      KC_PERC, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
-      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_CIRC,                                     KC_AMPR, KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0, _______,
+      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_CIRC,                                     KC_AMPR, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______,
       _______, KC_BSLS,    KC_KP_MINUS, KC_LCBR, KC_RCBR, _______, _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
-                                        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+                                        _______, _______, _______, _______, _______, _______, _______, KC_KP_0, _______, _______
     ),
 /*
  * Unicode Number Pad
@@ -135,24 +133,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * "Toggle inputs" to switch back to the one you were just on.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   | Toggl |    D    |
- * |         |       |       |       |       |       |                                  |       |       |       |       | Inpts |         |
+ * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   |   D   |  Toggl  |
+ * |         |       |       |       |       |       |                                  |       |       |       |       |       |  Inpts  |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |                                  |   B   |   4   |   5   |   6   |   0   |    E    |
+ * |         |       |       |       |       |       |                                  |   B   |   4   |   5   |   6   |   E   |         |
  * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   | Cycle |    F    |
- * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       | Inpts |         |
+ * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   |   F   |  Cycle  |
+ * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |  Inpts  |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |   0   |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [UNICODE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                     KC_A,   KC_KP_7, KC_KP_8, KC_KP_9, KC_TOGGLE_INPUTS, KC_D,
-      _______, _______, _______, _______, _______, _______,                                     KC_B,   KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0,          KC_E,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_C,   KC_KP_1, KC_KP_2, KC_KP_3, KC_CYCLE_INPUTS,  KC_F,
-                                 _______, _______, _______, _______, _______, _______, _______,_______, _______, _______
+      _______, _______, _______, _______, _______, _______,                                     KC_A,   KC_KP_7, KC_KP_8, KC_KP_9, KC_D, KC_TOGGLE_INPUTS,
+      _______, _______, _______, _______, _______, _______,                                     KC_B,   KC_KP_4, KC_KP_5, KC_KP_6, KC_E, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_C,   KC_KP_1, KC_KP_2, KC_KP_3, KC_F, KC_CYCLE_INPUTS,
+                                 _______, _______, _______, _______, _______, _______, _______, KC_KP_0, _______, _______
     ),
 /*
  * Navigation Layer
