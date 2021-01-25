@@ -93,9 +93,14 @@ None of these added enough value though
 and removing them drastically improved my firmware size (by more than a kilobyte!).
 I'm currently tinkering with new ways to handle undo-redo and find & replace.
 
+At one point I used a "hold" layer to be able to hold space, tab, backspace and delete
+without activating the hold equivalent of each.
+Then I realized that on the default settings I could tap + hold them and it would work.
+
 # Open Tasks and Ideas
 
 * Continue tinkering with the placement of shortcut keys.
+  Consider putting shift in something like the traditional pinky placement (2nd row)?
 * Consider auto-shift; nothing wrong with using that _and_ the modifier key.
 * Consider using aliases for keys as outlined in the home row modifiers article.
   It certainly makes the code easier to read.

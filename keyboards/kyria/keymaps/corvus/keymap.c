@@ -44,10 +44,8 @@ char hsl_buffer[3];
 // TODO: Make the layers match the enum.
 enum layers {
     COLEMAK = 0,
-    _HOLD,
-    NUMPAD,
+    NUMBERS,
     UNICODE,
-    SYMBOLS,
     NAV,
     CHROME,
     VSCODE,
@@ -68,7 +66,7 @@ enum custom_keycodes {
 };
 
 // to add layers, add them here, but also check `enum layers` above
-// and `layer_state_set_user` and `render_status` below
+// and `render_status` below
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: COLEMAK DH(m)
@@ -81,151 +79,116 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |   Esc   |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |Caps Lock|   A   |   R   |   S   |   T   |   G   |                                  |   M   |   N   |   E   |   I   |   O   |   ' "   |
- * |         | HOLD  |       |       |       |       |                                  |       |       |       |       |       |         |
+ * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |         |   Z   |   X   |   C   |   D   |   V   |       |       |  |       |       |   K   |   H   |  , <  |  . >  |  / ?  |  Enter  |
- * | Control |       |       |       |       |       |       |       |  |       |  Opt  |       |       |       |       |       |         |
+ * | Control |       |       |       |       |       |Command|       |  |       |  Opt  |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |Backspc|  Del  |  |  Tab  | Space |       |       |       |
- *                           |       |       | NUMPD |Command|  NAV  |  | ADJST | Shift |  Opt  |       |       |
+ *                           |       | ADJST |  NAV  | Shift |Command|  |  Opt  | Shift |NUMBERS|UNICODE|       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [COLEMAK] = LAYOUT(
-      KC_BKTK_ESCAPE, KC_Q,            KC_W,    KC_F,    KC_P,    KC_B,                                                                               KC_J,    KC_L,    KC_U,    KC_Y,   KC_SCLN, KC_MINS,
-      KC_CAPS,        LT(_HOLD, KC_A), KC_R,    KC_S,    KC_T,    KC_G,                                                                               KC_M,    KC_N,    KC_E,    KC_I,   KC_O,    KC_QUOT,
-      KC_LCTL,        KC_Z,            KC_X,    KC_C,    KC_D,    KC_V,       KC_LSFT,         _______,          _______,            KC_LOPT,         KC_K,    KC_H,    KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
-                                                _______, _______, MO(NUMPAD), LCMD_T(KC_BSPC), LT(NAV, KC_DEL),  LT(ADJUST, KC_TAB), LSFT_T(KC_SPC),  KC_LOPT, _______, _______
+      KC_BKTK_ESCAPE, KC_Q,    KC_W,    KC_F,    KC_P,       KC_B,                                                                       KC_J,        KC_L,       KC_U,    KC_Y,   KC_SCLN, KC_MINS,
+      KC_CAPS,        KC_A,    KC_R,    KC_S,    KC_T,       KC_G,                                                                       KC_M,        KC_N,       KC_E,    KC_I,   KC_O,    KC_QUOT,
+      KC_LCTL,        KC_Z,    KC_X,    KC_C,    KC_D,       KC_V,    KC_LCMD,         _______,         _______,        KC_LOPT,         KC_K,        KC_H,       KC_COMM, KC_DOT, KC_SLSH, KC_ENTER,
+                                        _______, MO(ADJUST), MO(NAV), LSFT_T(KC_BSPC), LCMD_T(KC_DEL),  LOPT_T(KC_TAB), LSFT_T(KC_SPC),  MO(NUMBERS), KC_UNICODE, _______
     ),
 /*
- * Hold
- * Allows continuous holding of backspace, space, and delete;
- * puts space on the left hand for when I'm holding the mouse.
- * Tab and shift tab are also on the left hand.
+ * Numbers and Symbols
+ * number placement mimics that of the traditional number pad
+ * some symbols follow a novel logic that makes sense to me
+ * the rest follow follow the 1-8 order of the traditional number row
+ *   these are noted here by tripling them
+ *   I may decide to change these later;
+ *     in particular I'd like backtick to be easier to get to for markdown!
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
+ * |         |   /   |   +   |   [   |   ]   |  ###  |                                  |  ^^^  |   7   |   8   |   9   |  ***  |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |  Tab  |ShftTab|                                  |       |       |       |       |       |         |
+ * |         |   |   |   =   |   (   |   )   |  @@@  |                                  |  %%%  |   4   |   5   |   6   |   0   |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       |       |         |
+ * |         |   \   |   -   |   {   |   }   |  !!!  |       |       |  |       |       |  $$$  |   1   |   2   |   3   |  &&&  |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       | Space |Backspc|  Del  |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
-    [_HOLD] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
-      _______, _______, _______, _______, KC_TAB,  S(KC_TAB),                                   _______, _______, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                 _______, _______, KC_SPC,  KC_BSPC, KC_DEL,  _______, _______, _______, _______, _______
+    [NUMBERS] = LAYOUT(
+      _______, KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, KC_HASH,                                     KC_CIRC, KC_KP_7, KC_KP_8, KC_KP_9, KC_ASTR, _______,
+      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_AT,                                       KC_PERC, KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0, _______,
+      _______, KC_BSLS,    KC_KP_MINUS, KC_LCBR, KC_RCBR, KC_EXLM, _______, _______, _______, _______, KC_DLR,  KC_KP_1, KC_KP_2, KC_KP_3, KC_AMPR, _______,
+                                        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
 /*
- * Modified Number Pad with Selected Symbols
- * intended primarily for *entering numerical values*
- * most symbols can be found in familiar locations on the SYMBOLS layer
- * some that are particularly common for coding are conveniently arranged on the left
- * in particular, =/+ if not left in the traditional location
- *   because it gets awfully confusing to have it on the same key with -/_
- *
- * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |   /   |   +   |   [   |   ]   |       |                                  |       |   7   |   8   |   9   |       |         |
- * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |   |   |   =   |   (   |   )   |       |                                  |       |   4   |   5   |   6   |       |         |
- * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * | UNICODE |   \   |   -   |   {   |   }   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
- * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  |       |   0   |       |       |       |
- *                           |       |       |       |       |       |  |       |SYMBOLS|       |       |       |
- *                           `---------------------------------------'  `---------------------------------------'
- */
-    [NUMPAD] = LAYOUT(
-      _______,    KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, _______,                                                  _______, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
-      _______,    S(KC_BSPC), KC_KP_EQUAL, KC_LPRN, KC_RPRN, _______,                                                  _______, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______,
-      KC_UNICODE, KC_BSPC,    KC_KP_MINUS, KC_LCBR, KC_RCBR, _______, _______, _______, _______, _______,              _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
-                                           _______, _______, _______, _______, _______, _______, LT(SYMBOLS, KC_KP_0), _______, _______, _______
-    ),
-/*
- * Unicode Pad
- * intended primarily for *entering unicode hex values*
- * KC_UNICODE on the NUMPAD layer, when tapped and held, will activate this layer *and hold the option key*
+ * Unicode Number Pad
+ * intended for *entering unicode hex values*
+ * KC_UNICODE in the base layer, when tapped and held, will activate this layer *and hold the option key*
  * "Cycle inputs" to cycle through keymap inputs. You have to have enabled unicode input on your Mac.
  * "Toggle inputs" to switch back to the one you were just on.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |       |       |       |       |       |                                  |   A   |       |       |       |   D   |         |
+ * |         |       |       |       |       |       |                                  |   A   |   7   |   8   |   9   | Toggl |    D    |
+ * |         |       |       |       |       |       |                                  |       |       |       |       | Inpts |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |                                  |   B   |       |       |       |   E   |         |
+ * |         |       |       |       |       |       |                                  |   B   |   4   |   5   |   6   |   0   |    E    |
+ * |         |       |       |       |       |       |                                  |       |       |       |       |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |       |       |       |       |       |       |  |       |       |   C   |       |       |       |   F   |         |
+ * |         |       |       |       |       |       |       |       |  |       |       |   C   |   1   |   2   |   3   | Cycle |    F    |
+ * |         |       |       |       |       |       |       |       |  |       |       |       |       |       |       | Inpts |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
- *                           |       |       |       |       |       |  | Cycle |       | Toggl |       |       |
- *                           |       |       |       |       |       |  | Inpts |       | Inpts |       |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [UNICODE] = LAYOUT(
-      _______, _______, _______, _______, _______, _______,                                             KC_A,             _______, _______, _______, KC_D, _______,
-      _______, _______, _______, _______, _______, _______,                                             KC_B,             _______, _______, _______, KC_E, _______,
-      _______, _______, _______, _______, _______, _______, _______, _______, _______,         _______, KC_C,             _______, _______, _______, KC_F, _______,
-                                 _______, _______, _______, _______, _______, KC_CYCLE_INPUTS, _______, KC_TOGGLE_INPUTS, _______, _______
+      _______, _______, _______, _______, _______, _______,                                     KC_A,   KC_KP_7, KC_KP_8, KC_KP_9, KC_TOGGLE_INPUTS, KC_D,
+      _______, _______, _______, _______, _______, _______,                                     KC_B,   KC_KP_4, KC_KP_5, KC_KP_6, KC_KP_0,          KC_E,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_C,   KC_KP_1, KC_KP_2, KC_KP_3, KC_CYCLE_INPUTS,  KC_F,
+                                 _______, _______, _______, _______, _______, _______, _______,_______, _______, _______
     ),
- /*
-  * Symbols
-  * Places symbols in a modified top-row pattern
-  * intended as a sort of shift mode for the numpad layer
-  * backtick is common enough in markdown to get prime real estate of its own
-  * also I should not have to drop out of number mode for period and comma,
-  *   so they are added in the normal position
-  *
-  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
-  * |    ~    |   !   |   @   |   #   |   $   |   %   |                                  |   ^   |   &   |   *   |   (   |   )   |         |
-  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |   `   |       |                                  |       |       |       |       |       |         |
-  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
-  * |         |       |       |       |       |       |       |       |  |       |       |       |       |   ,   |   .   |       |         |
-  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
-  *                           |       |       |       |       |       |  |       |       |       |       |       |
-  *                           |       |       |       |       |       |  |       |       |       |       |       |
-  *                           `---------------------------------------'  `---------------------------------------'
-  */
-     [SYMBOLS] = LAYOUT(
-       KC_TILD,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                     KC_CIRC, KC_AMPR, KC_ASTR,   KC_LPRN,     KC_RPRN, _______,
-       _______,  _______, _______, _______, KC_GRV,  _______,                                     _______, _______, _______,   _______,     _______, _______,
-       _______,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_KP_DOT, KC_KP_COMMA, _______, _______,
-                                   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
-     ),
 /*
  * Navigation Layer
- * Page up and down are not much used on a Mac, or even home and end.
+ * intended for tab navigation and text selection/manipulation.
+ * arrow keys are positioned on the right hand mimicking the traditional placement.
+ *   page up and down are not much used on a Mac, or even home and end for that matter.
+ *   use CHROME and VSCODE layers with the arrows to navigate between tabs
+ *   1Password is command-shift-X to open the 1Password password prompt.
+ * command, shift, and option are placed conveniently in the home row on the left hand.
+ * the top row of the left hand is left intact with command added.
+ *   backtick, q, and w are particularly important on a mac.
+ *   p, pressed with shift, is useful in VS code.
  * KC_SWITCH is for switching tabs on a Mac.
  *     When pressed the first time, it depresses command and leaves it down, and then taps tab.
  *     Any other time it will just press tab.
  *     Command will be released when dropping out of the layer
  *     (see layer_state_set_kb below).
+ * the bottom row on the left is a modified version of the traditional Cmd-ZXCV pattern.
+ * Cmd-V (for now?) is left in the non-DHm position.
  * Undo and redo are command-z and command-shift-z, respectively.
  * Format is the VS Code shortcut, option-shift-F.
  * Insert follows the VS Code Overtype extension, with command-shift-I.
  *     https://marketplace.visualstudio.com/items?itemName=adammaras.overtype
  *     It's frankly annoying that Mac doesn't use the insert key in general.
  * Screenshot is the Mac shortcut to capture an area of the screen: command-shift-4.
- * 1Password is command-shift-X to open the 1Password password prompt.
- * use CHROME and VSCODE layers to navigate between tabs
+ * Escape is left close to its position in the default layer.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |Cmd-Bactc| Cmd-Q | Cmd-W |VSCODE |CHROME |       |                                  |       |       |   ↑   |       |       |         |
+ * |Cmd-Bactc| Cmd-Q | Cmd-W | Cmd-F | Cmd-P | Cmd-B |                                  |       |       |   ↑   |       |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |   Esc   |Scrnsht|Command| Shift |  Opt  |Switch |                                  |       |   ←   |   ↓   |   →   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
  * |  Redo   | Undo  |  Cut  | Copy  | Paste |Format |Insert |       |  |       |       |       |       |       |       |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |1Passwd|       |       |       |       |
- *                           |       |       |       |       |       |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  |       |CHROME |VSCODE |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NAV] = LAYOUT(
-      LCMD(KC_GRAVE), LCMD(KC_Q), LCMD(KC_W), MO(VSCODE), MO(CHROME), _______,                                             _______, _______, KC_UP,   _______, _______, _______,
-      KC_ESC,         SCMD(KC_4), KC_LCMD,    KC_LSFT,    KC_LOPT,    KC_SWITCH,                                           _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
-      SCMD(KC_Z),     LCMD(KC_Z), LCMD(KC_X), LCMD(KC_C), LCMD(KC_V), LSA(KC_F), SCMD(KC_I), _______, _______,    _______, _______, _______, _______, _______, _______, _______,
-                                              _______,    _______,    _______,   _______,    _______, SCMD(KC_X), _______, _______, _______, _______
+      G(KC_GRAVE), G(KC_Q),    G(KC_W), G(KC_F), G(KC_P), G(KC_B),                                                _______,    _______, KC_UP,   _______, _______, _______,
+      KC_ESC,      SCMD(KC_4), KC_LCMD, KC_LSFT, KC_LOPT, KC_SWITCH,                                              _______,    KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+      SCMD(KC_Z),  G(KC_Z),    G(KC_X), G(KC_C), G(KC_V), LSA(KC_F), SCMD(KC_I), _______, _______,    _______,    _______,    _______, _______, _______, _______, _______,
+                                        _______, _______,   _______, _______,    _______, SCMD(KC_X), MO(CHROME), MO(VSCODE), _______, _______
     ),
  /*
   * Chrome
@@ -262,10 +225,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   *                           `---------------------------------------'  `---------------------------------------'
   */
      [VSCODE] = LAYOUT(
-       _______, _______, _______, _______, _______, _______,                                     _______, _______,             _______, _______,             _______, _______,
-       _______, _______, _______, _______, _______, _______,                                     _______, LOPT(LCMD(KC_LEFT)), _______, LOPT(LCMD(KC_RGHT)), _______, _______,
-       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,             _______, _______,             _______, _______,
-                                  _______, _______, _______, _______, _______, _______, _______, _______, _______,             _______
+       _______, _______, _______, _______, _______, _______,                                     _______, _______,          _______, _______,          _______, _______,
+       _______, _______, _______, _______, _______, _______,                                     _______, LOPT(G(KC_LEFT)), _______, LOPT(G(KC_RGHT)), _______, _______,
+       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,          _______, _______,
+                                  _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______
      ),
 /*
  * Adjust Layer
@@ -279,17 +242,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
  * |         | Reset |  HUI  |  SAI  |  VAI  |       |                                  |       |  F4   |  F5   |  F6   |  F11  |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |       |  HUD  |  SAD  |  VAD  |       |       | VolUp |  |       |       |       |  F1   |  F2   |  F3   |  F12  |         |
+ * |         |       |  HUD  |  SAD  |  VAD  |       |       |       |  | VolUp |       |       |  F1   |  F2   |  F3   |  F12  |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |       |       |       |
- *                           |  Prev |  Play |  Next |  Mute | VolDn |  |       |       |       |       |       |
+ *                           |       |       |       |       |       |  | VolDn |  Mute |  Prev |  Play |  Next |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [ADJUST] = LAYOUT(
       _______, _______, RGB_HUG, RGB_SAG, RGB_VAG, _______,                                     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
       _______, RGB_RST, RGB_HUI, RGB_SAI, RGB_VAI, _______,                                     _______, KC_F4,   KC_F5,   KC_F6,   KC_F11,  _______,
-      _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, KC_VOLU, _______, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
-                                 KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______
+      _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______, _______, _______, KC_VOLU, _______, _______, KC_F1,   KC_F2,   KC_F3,   KC_F12,  _______,
+                                 _______, _______, _______, _______, _______, KC_VOLD, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT
     ),
 // /*
 //  * Layer template
@@ -505,17 +468,11 @@ static void render_status(void) {
         case COLEMAK:
             oled_write_P(PSTR("Colemak\n"), false);
             break;
-        case _HOLD:
-            oled_write_P(PSTR("Hold\n"), false);
-            break;
-        case NUMPAD:
-            oled_write_P(PSTR("Numpad\n"), false);
+        case NUMBERS:
+            oled_write_P(PSTR("Numbers\n"), false);
             break;
         case UNICODE:
             oled_write_P(PSTR("Unicode\n"), false);
-            break;
-        case SYMBOLS:
-            oled_write_P(PSTR("Symbols\n"), false);
             break;
         case NAV:
             oled_write_P(PSTR("Navigation\n"), false);
