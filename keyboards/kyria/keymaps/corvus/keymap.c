@@ -103,26 +103,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Numbers and Symbols
  * number placement mimics that of the traditional number pad
  * some symbols follow a novel logic that makes sense to me
- *   even dollar and carat are paired for regular expressions,
- *     though it may make more sense to put the carat on top.
+ *   even dollar and carat are paired for regular expressions.
  * some symbols are moved to the NAV layer to make them easier to type.
  * I really tried to avoid the in-and-down index stretch, which I find unnatural.
  *
  * ,-------------------------------------------------.                                  ,-------------------------------------------------.
- * |         |   /   |   +   |   [   |   ]   |   $   |                                  |   %   |   7   |   8   |   9   |       |         |
+ * |         |   /   |   +   |   {   |   }   |   ^   |                                  |   &   |   7   |   8   |   9   |       |         |
  * |---------+-------+-------+-------+-------+-------|                                  |-------+-------+-------+-------+-------+---------|
- * |         |   |   |   =   |   (   |   )   |   ^   |                                  |   &   |   4   |   5   |   6   |       |         |
+ * |         |   |   |   =   |   (   |   )   |   $   |                                  |   %   |   4   |   5   |   6   |       |         |
  * |---------+-------+-------+-------+-------+-------+---------------.  ,---------------+-------+-------+-------+-------+-------+---------|
- * |         |   \   |   -   |   {   |   }   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
+ * |         |   \   |   -   |   [   |   ]   |       |       |       |  |       |       |       |   1   |   2   |   3   |       |         |
  * `-------------------------+-------+-------+-------+-------+-------|  |-------+-------+-------+-------+-------+-------------------------'
  *                           |       |       |       |       |       |  |       |       |   0   |       |       |
  *                           |       |       |       |       |       |  |       |       |       |       |       |
  *                           `---------------------------------------'  `---------------------------------------'
  */
     [NUMBERS] = LAYOUT(
-      _______, KC_SLASH,   KC_KP_PLUS,  KC_LBRC, KC_RBRC, KC_DLR,                                      KC_PERC, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
-      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_CIRC,                                     KC_AMPR, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______,
-      _______, KC_BSLS,    KC_KP_MINUS, KC_LCBR, KC_RCBR, _______, _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
+      _______, KC_SLASH,   KC_KP_PLUS,  KC_LCBR, KC_RCBR, KC_CIRC,                                     KC_AMPR, KC_KP_7, KC_KP_8, KC_KP_9, _______, _______,
+      _______, S(KC_BSLS), KC_KP_EQUAL, KC_LPRN, KC_RPRN, KC_DLR,                                      KC_PERC, KC_KP_4, KC_KP_5, KC_KP_6, _______, _______,
+      _______, KC_BSLS,    KC_KP_MINUS, KC_LBRC, KC_RBRC, _______, _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, _______, _______,
                                         _______, _______, _______, _______, _______, _______, _______, KC_KP_0, _______, _______
     ),
 /*
